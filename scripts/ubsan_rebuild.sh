@@ -73,16 +73,21 @@ target="$(docker run --rm --platform "$PLATFORM" "$img" \
 [ -n "$target" ] || { echo "{\"id\":\"$id\",\"error\":\"cannot determine fuzz target\"}" | tee "$dst/result.json"; exit 1; }
 say "target=$target ${project:+project=$project}"
 
-# Recompile the vulnerable tree with UBSan, then replay the PoV directly.
+# Recompile the vulnerable tree with UBSan, then replay the PoV directly. OSS-Fuzz's
+# 'compile' needs FUZZING_LANGUAGE and FUZZING_ENGINE (ARVO's 'arvo compile' wrapper sets them;
+# bare 'compile' aborts with "unbound variable"), and /work holds the ASan build's
+# intermediates, which would otherwise be linked into the UBSan build (undefined __asan_*).
 # silence_unsigned_overflow=0 is essential: unsigned wraparound IS the CWE-190 signal.
 say "recompiling with SANITIZER=undefined and replaying (cpus=$BUILD_CPUS mem=$BUILD_MEM; minutes)"
 last_cpu=$((BUILD_CPUS - 1)); [ "$last_cpu" -ge 0 ] || last_cpu=0
 docker run --rm --platform "$PLATFORM" \
   --cpuset-cpus="0-${last_cpu}" --memory="$BUILD_MEM" --memory-swap="$BUILD_MEM" \
   -e SANITIZER=undefined \
+  -e FUZZING_LANGUAGE="${CF_LANG:-c++}" -e FUZZING_ENGINE="${CF_ENGINE:-libfuzzer}" \
+  -e ARCHITECTURE=x86_64 \
   -e UBSAN_OPTIONS='print_stacktrace=1:halt_on_error=0:silence_unsigned_overflow=0:symbolize=1' \
   "$img" \
-  bash -c "compile >/tmp/build.log 2>&1; echo \"BUILD_EXIT=\$?\"; tail -5 /tmp/build.log; echo '=== REPLAY ==='; /out/$target /tmp/poc 2>&1" \
+  bash -c "rm -rf /work/* 2>/dev/null; compile >/tmp/build.log 2>&1; echo \"BUILD_EXIT=\$?\"; grep -nE 'error|Error [0-9]' /tmp/build.log | head -8; tail -5 /tmp/build.log; echo '=== REPLAY ==='; /out/$target /tmp/poc 2>&1" \
   >"$dst/ubsan.txt" 2>&1
 run_rc=$?
 [ "$run_rc" -eq 0 ] || say "docker run exit=$run_rc (137 = OOM-killed)"

@@ -1,61 +1,61 @@
-394126186	tarantool
-42474987	net-snmp
-42475119	open62541
-42475195	radare2
-42477544	libhevc
-42477545	libhevc
-42477558	libhevc
-42477586	libhevc
-42477632	libhevc
-42477643	libhevc
-42477679	libhevc
-42481224	arrow
-42481296	arrow
-42481301	arrow
-42481315	arrow
-42481321	arrow
-42482360	htslib
-42484040	stb
-42485645	htslib
-42489732	imagemagick
-42490980	freetype2
-42493062	c-blosc2
-42498233	tinygltf
-42500232	libexif
-42500238	libexif
-42500764	draco
-42500776	draco
-42500885	draco
-42500938	draco
-42502890	tinygltf
-42505027	draco
-42510029	fluent-bit
-42510070	fluent-bit
-42510536	lwan
-42512011	grpc
-42512265	duckdb
-42517929	mruby
-42517942	mruby
-42521123	libgit2
-42522531	hdf5
-42523342	c-blosc2
-42523993	hdf5
-42524018	hdf5
-42524740	hdf5
-42524913	opencv
-42525184	hdf5
-42526388	c-blosc2
-42527328	hdf5
-42527526	hdf5
-42527895	hdf5
-42529681	hdf5
-42530550	hdf5
-42531297	jq
-42532796	jq
-42534125	hdf5
-42534286	hdf5
-42536073	arduinojson
-42536161	wamr
-42536593	inchi
-42536641	inchi
-42537424	llama.cpp
+394126186	tarantool	c	libfuzzer
+42474987	net-snmp	c++	libfuzzer
+42475119	open62541	c++	libfuzzer
+42475195	radare2	c++	libfuzzer
+42477544	libhevc	c++	libfuzzer
+42477545	libhevc	c++	libfuzzer
+42477558	libhevc	c++	libfuzzer
+42477586	libhevc	c++	libfuzzer
+42477632	libhevc	c++	libfuzzer
+42477643	libhevc	c++	libfuzzer
+42477679	libhevc	c++	libfuzzer
+42481224	arrow	c++	libfuzzer
+42481296	arrow	c++	afl
+42481301	arrow	c++	libfuzzer
+42481315	arrow	c++	libfuzzer
+42481321	arrow	c++	libfuzzer
+42482360	htslib	c++	honggfuzz
+42484040	stb	c++	afl
+42485645	htslib	c++	libfuzzer
+42489732	imagemagick	c++	libfuzzer
+42490980	freetype2	c++	libfuzzer
+42493062	c-blosc2	c++	libfuzzer
+42498233	tinygltf	c++	libfuzzer
+42500232	libexif	c++	libfuzzer
+42500238	libexif	c++	afl
+42500764	draco	c++	libfuzzer
+42500776	draco	c++	honggfuzz
+42500885	draco	c++	honggfuzz
+42500938	draco	c++	honggfuzz
+42502890	tinygltf	c++	libfuzzer
+42505027	draco	c++	honggfuzz
+42510029	fluent-bit	c++	afl
+42510070	fluent-bit	c++	afl
+42510536	lwan	c++	libfuzzer
+42512011	grpc	c++	libfuzzer
+42512265	duckdb	c++	libfuzzer
+42517929	mruby	c++	libfuzzer
+42517942	mruby	c++	libfuzzer
+42521123	libgit2	c++	honggfuzz
+42522531	hdf5	c	libfuzzer
+42523342	c-blosc2	c++	libfuzzer
+42523993	hdf5	c	afl
+42524018	hdf5	c	libfuzzer
+42524740	hdf5	c	afl
+42524913	opencv	c++	libfuzzer
+42525184	hdf5	c	afl
+42526388	c-blosc2	c++	libfuzzer
+42527328	hdf5	c	afl
+42527526	hdf5	c	afl
+42527895	hdf5	c	afl
+42529681	hdf5	c	afl
+42530550	hdf5	c	afl
+42531297	jq	c	libfuzzer
+42532796	jq	c	afl
+42534125	hdf5	c	afl
+42534286	hdf5	c	libfuzzer
+42536073	arduinojson	c++	libfuzzer
+42536161	wamr	c	libfuzzer
+42536593	inchi	c	libfuzzer
+42536641	inchi	c	afl
+42537424	llama.cpp	c++	libfuzzer
