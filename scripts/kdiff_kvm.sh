@@ -95,7 +95,13 @@ GCC="${CF_GCC:-$GCC}"  # a retry may force another compiler after a build failur
 CROSS="$BASE/tools/gcc-$GCC-nolibc/x86_64-linux/bin/x86_64-linux-"
 [[ -x "${CROSS}gcc" ]] || emit toolchain_missing "$GCC"
 GCCV="$GCC"
-MK=(make -C "$KSRC" -j"$JOBS" CROSS_COMPILE="$CROSS" KCFLAGS=-g0 HOSTCFLAGS="-g0 -O2")
+# Host tools (objtool, modpost) build with the HOST compiler and -Werror; a modern host gcc
+# rejects pre-6.x objtool. Use an era-appropriate host gcc when one is installed (GitHub
+# runners: gcc-11); elsewhere the host default stays (CSE: gcc 8.5, which builds them fine).
+HOSTCC="${CF_HOSTCC:-}"
+if [[ -z "$HOSTCC" ]] && (( VER < 6 )) && command -v gcc-11 >/dev/null; then HOSTCC=gcc-11; fi
+MK=(make -C "$KSRC" -j"$JOBS" CROSS_COMPILE="$CROSS" KCFLAGS=-g0 HOSTCFLAGS="-g0 -O2"
+    ${HOSTCC:+HOSTCC=$HOSTCC} ${HOSTCC:+HOSTCXX=${HOSTCC/gcc/g++}})
 
 cp "$WORK/kernel.config" "$KSRC/.config"
 cat >> "$KSRC/.config" <<'CFG'
@@ -120,7 +126,8 @@ build() {  # label
   nice -n 10 "${MK[@]}" olddefconfig >/dev/null 2>&1
   nice -n 10 "${MK[@]}" bzImage >"$WORK/build.$1.log" 2>&1
   if [[ -f "$KSRC/arch/x86/boot/bzImage" ]]; then cp "$KSRC/arch/x86/boot/bzImage" "$WORK/bzImage.$1"; return 0; fi
-  tail -30 "$WORK/build.$1.log" > "$OUT/build.$1.tail.log"; return 1
+  grep -nE "error|Error [0-9]" "$WORK/build.$1.log" | head -20 > "$OUT/build.$1.errors.log"
+  tail -80 "$WORK/build.$1.log" > "$OUT/build.$1.tail.log"; return 1
 }
 
 # 4. Reproducer + rootfs, identical for both revisions so the kernel is the only variable.
