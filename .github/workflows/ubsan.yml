@@ -1,0 +1,66 @@
+name: ubsan
+on:
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: "Case list (<arvo id>\\t<project> per line), path in this repo"
+        required: true
+        default: "cases/len3_ubsan.tsv"
+      shards:
+        description: "Parallel runners"
+        required: true
+        default: "20"
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      shards: ${{ steps.s.outputs.shards }}
+    steps:
+      - id: s
+        run: echo "shards=$(python3 -c "import json;print(json.dumps(list(range(${{ github.event.inputs.shards }}))))")" >> "$GITHUB_OUTPUT"
+
+  ubsan:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJson(needs.plan.outputs.shards) }}
+    env:
+      CF_UBSAN_OUT: ${{ github.workspace }}/out
+      CF_BUILD_CPUS: "4"
+      CF_BUILD_MEM: "14g"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk for multi-GB images
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          docker system prune -af >/dev/null
+      - name: Docker Hub login (optional)
+        env:
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        if: env.DOCKERHUB_TOKEN != ''
+        run: echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USER" --password-stdin
+      - name: UBSan rebuild + replay, vulnerable and fixed revisions
+        run: |
+          n=${{ github.event.inputs.shards }}; i=0
+          while IFS=$'\t' read -r id project; do
+            [ -z "$id" ] && continue
+            if [ $(( i % n )) -eq ${{ matrix.shard }} ]; then
+              for side in vul fix; do
+                CF_SIDE=$side bash scripts/ubsan_rebuild.sh "$id" "$project" || true
+              done
+              docker rmi -f "n132/arvo:$id-vul" "n132/arvo:$id-fix" >/dev/null 2>&1 || true
+            fi
+            i=$((i+1))
+          done < "${{ github.event.inputs.cases }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ubsan-${{ matrix.shard }}
+          path: out/
+          retention-days: 30
+          if-no-files-found: warn
