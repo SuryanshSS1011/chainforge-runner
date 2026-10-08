@@ -1,0 +1,79 @@
+name: kdiff
+on:
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: "Kernel case list (<syzbot extid>\\t<fix sha> per line), path in this repo"
+        required: true
+      shards:
+        description: "Parallel runners"
+        required: true
+        default: "20"
+      vul_boots:
+        description: "Boots of fix^ before giving up (races fire intermittently)"
+        required: true
+        default: "1"
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      shards: ${{ steps.s.outputs.shards }}
+    steps:
+      - id: s
+        run: echo "shards=$(python3 -c "import json;print(json.dumps(list(range(${{ github.event.inputs.shards }}))))")" >> "$GITHUB_OUTPUT"
+
+  kdiff:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJson(needs.plan.outputs.shards) }}
+    env:
+      CF_BASE: ${{ github.workspace }}/w
+      CF_QEMU: qemu-system-x86_64
+      CF_JOBS: "4"
+      CF_VUL_BOOTS: ${{ github.event.inputs.vul_boots }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk; install QEMU and kernel build deps; open /dev/kvm
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq qemu-system-x86 flex bison bc libelf-dev libssl-dev cpio e2fsprogs >/dev/null
+          sudo chmod 666 /dev/kvm
+          mkdir -p "$CF_BASE"/{tools,imgbuild,out,work,logs}
+          cp scripts/kdiff_kvm.sh scripts/build_rootfs.sh "$CF_BASE"/
+      - name: Cache kernel.org crosstool compilers
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/w/tools
+          key: crosstool-10.5-12.3-13.2
+      - name: Fetch compilers and busybox
+        run: |
+          cd "$CF_BASE/tools"
+          for v in 10.5.0 12.3.0 13.2.0; do
+            [ -d gcc-$v-nolibc ] || curl -sSfL https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/x86_64/$v/x86_64-gcc-$v-nolibc-x86_64-linux.tar.xz | tar xJ
+          done
+          curl -sSfL -o "$CF_BASE/imgbuild/busybox" https://busybox.net/downloads/binaries/1.35.0-x86_64-linux-musl/busybox
+          chmod +x "$CF_BASE/imgbuild/busybox"
+      - name: Two-sided kernel replays for this shard
+        run: |
+          n=${{ github.event.inputs.shards }}; i=0
+          while IFS=$'\t' read -r extid fix; do
+            [ -z "$extid" ] && continue
+            if [ $(( i % n )) -eq ${{ matrix.shard }} ]; then
+              bash "$CF_BASE/kdiff_kvm.sh" "$extid" "$fix" 2>&1 | tail -20
+              gzip -f "$CF_BASE"/out/"$extid"/*.console.log 2>/dev/null || true
+            fi
+            i=$((i+1))
+          done < "${{ github.event.inputs.cases }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kdiff-${{ matrix.shard }}
+          path: w/out/
+          retention-days: 30
+          if-no-files-found: warn
