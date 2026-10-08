@@ -1,0 +1,17 @@
+name: probe
+on: workflow_dispatch
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: What this runner offers
+        run: |
+          echo "cores=$(nproc) mem=$(free -g | awk '/Mem/{print $2}')G"
+          ls -l /dev/kvm || echo "no /dev/kvm"
+          grep -cE 'vmx|svm' /proc/cpuinfo || true
+          sudo modprobe kvm_intel 2>&1 || true
+          id; groups
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h / | tail -1
+          which qemu-system-x86_64 || echo "no qemu (installable via apt)"
+          docker info --format '{{.ServerVersion}} {{.Driver}}'
