@@ -52,3 +52,7 @@
 42524177	capstonenext	https://github.com/aquynh/capstone/commit/926cfebd6b8d8d7317ade02eaed2d2868053d900
 42534794	fwupd	https://github.com/fwupd/fwupd/commit/2157ad2df4a3d92f7319de50b2d0d7bce1255fc0
 42535918	radare2	https://github.com/radareorg/radare2/commit/4134dfd6fea11a9ed14fe0576a68c5211a33c4d7
+42534286	hdf5	https://github.com/HDFGroup/hdf5/commit/c0192e236122f483c71723d66dddee2cdc80ed5a
+42473001	openthread	https://github.com/openthread/openthread/commit/f9659b3733b85ffb499692a6d2f18a6414782dc0
+42476221	icu	https://github.com/unicode-org/icu/commit/4833cc89b2fae2e8863b46bf1dc785964847e882
+40096184	skia	https://skia.googlesource.com/skia.git/+/07afa23bd0fa74d18fb7faee898b2a876536a170%5E%21/
