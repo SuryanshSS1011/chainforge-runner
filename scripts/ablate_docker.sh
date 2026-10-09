@@ -10,7 +10,7 @@
 set -uo pipefail
 ID="$1"; PROJECT="$2"; URL="$3"; OUT="$4"
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
-mkdir -p "$OUT"
+mkdir -p "$OUT"; OUT="$(cd "$OUT" && pwd)"   # docker -v needs an absolute path
 log(){ echo "[$ID] $*" >&2; }
 emit(){ printf '%s\n' "$1" > "$OUT/result.json"; exit 0; }
 IMG="n132/arvo:${ID}-vul"
@@ -39,15 +39,22 @@ variant(){  # <log> [patch] : fresh container, optional patch, full rebuild, rep
       for L in 1 0 2; do patch -p$L --forward --batch --dry-run < /tmp/cf_p.patch >/dev/null 2>&1 && break; done
       patch -p$L --forward --batch < /tmp/cf_p.patch > /tmp/p.log 2>&1 || { echo CF_PATCH_FAIL; cat /tmp/p.log; exit 9; }
     fi
+    # The image was built once already; a build.sh that runs a bare "mkdir build" dies on the
+    # second build. Make mkdir tolerant; nothing else in build.sh is touched.
+    sed -i -E "s/(^|[;&|[:space:]])mkdir ([^-])/\1mkdir -p \2/" "$SRC/build.sh" 2>/dev/null
     arvo compile > /tmp/b.log 2>&1 || { echo CF_BUILD_FAIL; tail -40 /tmp/b.log; exit 8; }
     arvo run 2>&1 | head -80' > "$1" 2>&1
 }
 verdict(){
   grep -q CF_PATCH_FAIL "$1" && { echo patchfail; return; }
   grep -q CF_BUILD_FAIL "$1" && { echo buildfail; return; }
-  [ -s "$1" ] || { echo infrafail; return; }
   grep -qE "ERROR: (Address|Memory|Leak)Sanitizer|WARNING: MemorySanitizer|runtime error:|SUMMARY: .*Sanitizer" "$1" \
-    && echo crashed || echo clean
+    && { echo crashed; return; }
+  # Clean only if the input demonstrably ran (R10): a container that never started also prints
+  # no sanitizer line.
+  grep -qE "Executed /tmp/poc|Execution successful" "$1" \
+    || { grep -q "Accepting input from '/tmp/poc'" "$1" && grep -q "Usage for fuzzing" "$1"; } \
+    && echo clean || echo infrafail
 }
 
 variant "$OUT/control.log"
