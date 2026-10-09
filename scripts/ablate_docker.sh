@@ -36,8 +36,19 @@ variant(){  # <log> [patch] : fresh container, optional patch, full rebuild, rep
   local P="${2:-}"
   timeout 7200 docker run --rm ${P:+-v "$P:/tmp/cf_p.patch:ro"} "$IMG" bash -c '
     if [ -f /tmp/cf_p.patch ]; then
-      for L in 1 0 2; do patch -p$L --forward --batch --dry-run < /tmp/cf_p.patch >/dev/null 2>&1 && break; done
-      patch -p$L --forward --batch < /tmp/cf_p.patch > /tmp/p.log 2>&1 || { echo CF_PATCH_FAIL; cat /tmp/p.log; exit 9; }
+      # The source tree is not always the WORKDIR (capstonenext builds from /src/capstonenext
+      # out of WORKDIR /src): apply where the patch dry-runs, preferring the project directory.
+      WD=$PWD; at=""
+      for D in "/src/'"$PROJECT"'" "$WD" /src/*/; do
+        for L in 1 0 2; do
+          (cd "$D" 2>/dev/null && patch -p$L --forward --batch --dry-run < /tmp/cf_p.patch >/dev/null 2>&1) \
+            && { at=$D; break 2; }
+        done
+      done
+      [ -n "$at" ] || { echo CF_PATCH_FAIL; cd "$WD"; patch -p1 --forward --batch --dry-run < /tmp/cf_p.patch; exit 9; }
+      (cd "$at" && patch -p$L --forward --batch < /tmp/cf_p.patch > /tmp/p.log 2>&1) || { echo CF_PATCH_FAIL; cat /tmp/p.log; exit 9; }
+      echo "CF_PATCHED_AT $at -p$L"
+      cd "$WD"
     fi
     # The image was built once already; a build.sh that runs a bare "mkdir build" dies on the
     # second build. Make mkdir tolerant; nothing else in build.sh is touched.
