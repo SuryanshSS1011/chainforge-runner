@@ -52,7 +52,7 @@ jobs:
             if [ $(( i % n )) -eq ${{ matrix.shard }} ]; then
               for side in vul fix; do
                 CF_SIDE=$side CF_LANG="${lang:-c++}" CF_ENGINE="${engine:-libfuzzer}" \
-                  bash scripts/ubsan_rebuild.sh "$id" "$project" || true
+                  bash scripts/ubsan_rebuild.sh "$id" "$project" </dev/null || true
               done
               docker rmi -f "n132/arvo:$id-vul" "n132/arvo:$id-fix" >/dev/null 2>&1 || true
             fi

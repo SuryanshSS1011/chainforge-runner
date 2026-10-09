@@ -50,7 +50,7 @@ jobs:
           while read -r id; do
             [ -z "$id" ] && continue
             if [ $(( i % n )) -eq ${{ matrix.shard }} ]; then
-              bash scripts/rerun.sh "$id" "out/$id"
+              bash scripts/rerun.sh "$id" "out/$id" </dev/null
             fi
             i=$((i+1))
           done < "${{ github.event.inputs.cases }}"

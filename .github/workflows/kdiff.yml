@@ -65,7 +65,7 @@ jobs:
           while IFS=$'\t' read -r extid fix; do
             [ -z "$extid" ] && continue
             if [ $(( i % n )) -eq ${{ matrix.shard }} ]; then
-              bash "$CF_BASE/kdiff_kvm.sh" "$extid" "$fix" 2>&1 | tail -20
+              bash "$CF_BASE/kdiff_kvm.sh" "$extid" "$fix" </dev/null 2>&1 | tail -20
               gzip -f "$CF_BASE"/out/"$extid"/*.console.log 2>/dev/null || true
             fi
             i=$((i+1))
