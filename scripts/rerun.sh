@@ -16,6 +16,10 @@ CRASH_RE='(AddressSanitizer|UndefinedBehaviorSanitizer|MemorySanitizer|LeakSanit
 EXEC_RE='Executed /tmp/poc|Execution successful'
 
 pull() { for t in 1 2 3; do docker pull -q "n132/arvo:$1" >>"$OUT/pull.log" 2>&1 && return 0; sleep 60; done; return 1; }
+cap() {  # a binary that loops on output wrote 10 GB per run; keep the head (crash) and tail (marker)
+  [ "$(stat -c %s "$1")" -gt 25000000 ] || return 0
+  { head -c 20000000 "$1"; printf '\n[CF: truncated]\n'; tail -c 2000000 "$1"; } > "$1.cap" && mv "$1.cap" "$1"
+}
 run() {  # tag log -> crashed | clean | not_run
   timeout 600 docker run --rm "n132/arvo:$1" arvo >"$2" 2>&1
   if grep -q "Shadow memory range interleaves" "$2"; then
@@ -24,6 +28,7 @@ run() {  # tag log -> crashed | clean | not_run
     sudo sysctl -qw kernel.randomize_va_space=2
     echo "aslr-off retry" >>"$OUT/notes.txt"
   fi
+  cap "$2"
   if grep -Eq "$CRASH_RE" "$2"; then echo crashed
   elif grep -Eq "$EXEC_RE" "$2" || { grep -q "Accepting input from '/tmp/poc'" "$2" && grep -q "Usage for fuzzing" "$2"; }; then echo clean
   else echo not_run; fi
