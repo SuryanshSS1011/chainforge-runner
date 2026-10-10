@@ -28,7 +28,11 @@ python3 "$HERE/repo/infra/verify/split_hunks.py" "$OUT/fix.diff" "$OUT/hunks" > 
   || emit '{"status":"hunk_split_failed"}'
 N=$(python3 -c "import json;print(json.load(open('$OUT/hunks/index.json'))['written'])" 2>/dev/null || echo 0)
 [ "$N" -gt 0 ] || emit '{"status":"no_code_hunks"}'
-for t in 1 2 3; do docker pull -q "$IMG" >/dev/null 2>&1 && break; sleep 60; done
+# Docker Hub allows ~200 pulls per 6 h; a 400-case batch exceeds it. Wait out the limit.
+for t in 1 2 3 4 5 6; do
+  docker pull -q "$IMG" > "$OUT/pull.log" 2>&1 && break
+  if grep -qi "toomanyrequests" "$OUT/pull.log"; then sleep 1800; else sleep 60; fi
+done
 docker image inspect "$IMG" >/dev/null 2>&1 || emit '{"status":"image_pull_failed"}'
 log "$N candidate hunks"
 
