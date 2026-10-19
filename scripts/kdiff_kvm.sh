@@ -29,13 +29,13 @@ rm -f "$OUT/differential.json"
 log() { echo "[kdiff $EXTID] $(date +%T) $*" >&2; }
 emit() {  # status detail
   python3 - "$OUT/differential.json" "$EXTID" "$FIX" "${PARENT:-}" "$1" "$2" \
-    "${VUL:-}" "${FIXR:-}" "${SIG:-}" "${GCCV:-}" "${CRASH_COMMIT:-}" <<'PY'
+    "${VUL:-}" "${FIXR:-}" "${SIG:-}" "${GCCV:-}" "${CRASH_COMMIT:-}" "${COMPAT:-0}" <<'PY'
 import json, sys
-out, extid, fix, parent, status, detail, vul, fixr, sig, gccv, crash = sys.argv[1:12]
+out, extid, fix, parent, status, detail, vul, fixr, sig, gccv, crash, compat = sys.argv[1:13]
 json.dump({"extid": extid, "fix_commit": fix, "vulnerable_commit": parent or None,
            "syzbot_crash_commit": crash or None, "status": status, "detail": detail,
            "vulnerable": vul or None, "patched": fixr or None, "expected_signature": sig,
-           "compiler": gccv or None,
+           "compiler": gccv or None, "build_compat": compat == "1",
            "match_rule": "PR-6" if vul == "fired_match_pr6" else ("strict" if vul == "fired_match" else None),
            "differential_complete": status == "differential"},
           open(out, "w"), indent=1)
@@ -121,11 +121,33 @@ CONFIG_BINFMT_ELF=y
 CONFIG_BINFMT_SCRIPT=y
 CFG
 
-build() {  # label
+# Host-toolchain compatibility, used only after a normal build fails. A modern host (glibc,
+# OpenSSL 3, libelf, gcc -Werror) breaks host-side tools of older kernels: SELinux genheaders
+# rejects the host's AF_MAX, sign-file and objtool hit deprecation errors. These touch no code
+# path the reproducer exercises, and once enabled they apply to BOTH revisions (the .config and
+# flags persist), so fix^ and fix still differ by exactly the fix. Recorded as build_compat.
+COMPAT=0
+enable_compat() {
+  COMPAT=1
+  cat >> "$KSRC/.config" <<'CFG'
+CONFIG_WERROR=n
+CONFIG_SECURITY_SELINUX=n
+CONFIG_MODULE_SIG=n
+CFG
+  MK+=(WERROR=0 KCFLAGS="-g0 -Wno-error" HOSTCFLAGS="-g0 -O2 -Wno-error -Wno-deprecated-declarations")
+}
+
+build_once() {  # label
   rm -f "$KSRC/arch/x86/boot/bzImage"
   nice -n 10 "${MK[@]}" olddefconfig >/dev/null 2>&1
   nice -n 10 "${MK[@]}" bzImage >"$WORK/build.$1.log" 2>&1
-  if [[ -f "$KSRC/arch/x86/boot/bzImage" ]]; then cp "$KSRC/arch/x86/boot/bzImage" "$WORK/bzImage.$1"; return 0; fi
+  [[ -f "$KSRC/arch/x86/boot/bzImage" ]]
+}
+
+build() {  # label
+  if build_once "$1" || { [[ $COMPAT == 0 ]] && log "build failed; retrying with host-toolchain compatibility" && enable_compat && build_once "$1"; }; then
+    cp "$KSRC/arch/x86/boot/bzImage" "$WORK/bzImage.$1"; return 0
+  fi
   grep -nE "error|Error [0-9]" "$WORK/build.$1.log" | head -20 > "$OUT/build.$1.errors.log"
   tail -80 "$WORK/build.$1.log" > "$OUT/build.$1.tail.log"; return 1
 }
