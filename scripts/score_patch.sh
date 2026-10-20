@@ -65,16 +65,24 @@ timeout 7200 docker run --rm "${MNT[@]}" -e CF_RUNS="$RUNS" "$IMG" bash -c '
     cd "$WD"
   fi
   sed -i -E "s/(^|[;&|[:space:]])mkdir ([^-])/\1mkdir -p \2/" "$SRC/build.sh" 2>/dev/null
+  t0=$(date +%s)
   arvo compile > /tmp/b.log 2>&1 || { echo CF_BUILD_FAIL; tail -40 /tmp/b.log; exit 8; }
+  echo "CF_BUILD_SECONDS $(( $(date +%s) - t0 ))"
   for i in $(seq 1 "$CF_RUNS"); do
+    t0=$(date +%s)
     echo "CF_RUN_BEGIN $i"
     timeout 600 arvo run 2>&1 | head -c 20000000
     echo "CF_RUN_END $i"
-  done' >"$OUT/score.log" 2>&1
+    echo "CF_RUN_SECONDS $i $(( $(date +%s) - t0 ))"
+  done
+  # Peak memory of this container (cgroup v2), for the README resource figures.
+  echo "CF_PEAK_MEM_BYTES $(cat /sys/fs/cgroup/memory.peak 2>/dev/null || echo 0)"' >"$OUT/score.log" 2>&1
 
-python3 - "$OUT" "$RUNS" "$CRASH_RE" "$EXEC_RE" "$PATCH" <<'PY'
+SIZE=$(docker image inspect --format '{{.Size}}' "$IMG" 2>/dev/null || echo 0)
+python3 - "$OUT" "$RUNS" "$CRASH_RE" "$EXEC_RE" "$PATCH" "$SIZE" <<'PY'
 import json, re, sys
 out, runs, crash_re, exec_re, patch = sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]
+size = int(sys.argv[6] or 0)
 log = open(f"{out}/score.log", errors="replace").read()
 def classify(t):
     if re.search(crash_re, t):
@@ -95,6 +103,14 @@ else:
     res["outcome"] = (
         "crash" if "crashed" in r else "not_run" if "not_run" in r or not r else "pass"
     )
+b = re.search(r"CF_BUILD_SECONDS (\d+)", log)
+mem = re.search(r"CF_PEAK_MEM_BYTES (\d+)", log)
+res["resources"] = {
+    "image_bytes": size,
+    "build_seconds": int(b.group(1)) if b else None,
+    "replay_seconds": [int(x) for x in re.findall(r"CF_RUN_SECONDS \d+ (\d+)", log)],
+    "peak_memory_bytes": int(mem.group(1)) if mem and mem.group(1) != "0" else None,
+}
 json.dump(res, open(f"{out}/result.json", "w"), indent=1)
 print(res["outcome"], res["runs"])
 PY
