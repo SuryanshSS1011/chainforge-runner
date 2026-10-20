@@ -13,6 +13,10 @@ on:
         description: "Boots of fix^ before giving up (races fire intermittently)"
         required: true
         default: "1"
+      fix_boots:
+        description: "Clean boots the fixed kernel must give (PR-6 floor 2; a retry arm matches vul_boots)"
+        required: true
+        default: "2"
 
 jobs:
   plan:
@@ -36,6 +40,7 @@ jobs:
       CF_QEMU: qemu-system-x86_64
       CF_JOBS: "4"
       CF_VUL_BOOTS: ${{ github.event.inputs.vul_boots }}
+      CF_FIX_BOOTS: ${{ github.event.inputs.fix_boots }}
     steps:
       - uses: actions/checkout@v4
       - name: Free disk; install QEMU and kernel build deps; open /dev/kvm

@@ -29,13 +29,16 @@ rm -f "$OUT/differential.json"
 log() { echo "[kdiff $EXTID] $(date +%T) $*" >&2; }
 emit() {  # status detail
   python3 - "$OUT/differential.json" "$EXTID" "$FIX" "${PARENT:-}" "$1" "$2" \
-    "${VUL:-}" "${FIXR:-}" "${SIG:-}" "${GCCV:-}" "${CRASH_COMMIT:-}" "${COMPAT:-0}" <<'PY'
+    "${VUL:-}" "${FIXR:-}" "${SIG:-}" "${GCCV:-}" "${CRASH_COMMIT:-}" "${COMPAT:-0}" \
+    "${VUL_TRIES:-0}" "${CF_FIX_BOOTS:-2}" <<'PY'
 import json, sys
 out, extid, fix, parent, status, detail, vul, fixr, sig, gccv, crash, compat = sys.argv[1:13]
+vul_tries, fix_boots = int(sys.argv[13]), int(sys.argv[14])
 json.dump({"extid": extid, "fix_commit": fix, "vulnerable_commit": parent or None,
            "syzbot_crash_commit": crash or None, "status": status, "detail": detail,
            "vulnerable": vul or None, "patched": fixr or None, "expected_signature": sig,
            "compiler": gccv or None, "build_compat": compat == "1",
+           "vulnerable_boots": vul_tries or None, "patched_boots_required": fix_boots,
            "match_rule": "PR-6" if vul == "fired_match_pr6" else ("strict" if vul == "fired_match" else None),
            "differential_complete": status == "differential"},
           open(out, "w"), indent=1)
@@ -205,6 +208,7 @@ build vul || emit vul_build_failed "$(grep -m1 -iE 'error' "$OUT/build.vul.tail.
 # Races fire intermittently: a retry may boot fix^ up to CF_VUL_BOOTS times, stopping at the
 # first matching crash. The patched side still has to stay clean on every one of its boots.
 for i in $(seq 1 "${CF_VUL_BOOTS:-1}"); do
+  VUL_TRIES=$i
   VUL=$(boot vul)
   log "fix^ boot $i: $VUL"
   [[ "$VUL" == fired_match* ]] && break
