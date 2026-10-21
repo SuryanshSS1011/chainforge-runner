@@ -1,0 +1,19 @@
+name: agentenv
+on:
+  workflow_dispatch:
+    inputs:
+      ids:
+        description: "Space-separated <id>:<fix sha> pairs"
+        required: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+      - name: Sanitize, check the fix is unreachable, rebuild
+        run: for p in ${{ github.event.inputs.ids }}; do bash scripts/agent_env.sh --check "${p%%:*}" "${p#*:}"; docker rmi -f "n132/arvo:${p%%:*}-vul" >/dev/null 2>&1; done | tee agentenv.jsonl
+      - uses: actions/upload-artifact@v4
+        with: {name: agentenv, path: agentenv.jsonl}
