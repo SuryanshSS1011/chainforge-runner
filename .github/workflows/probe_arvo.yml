@@ -1,0 +1,19 @@
+name: probe_arvo
+on:
+  workflow_dispatch:
+    inputs:
+      ids:
+        description: "Space-separated ARVO ids"
+        required: true
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+      - name: Probe
+        run: for id in ${{ github.event.inputs.ids }}; do echo "######## $id"; bash scripts/probe_arvo.sh "$id"; done 2>&1 | tee probe.log
+      - uses: actions/upload-artifact@v4
+        with: {name: probe, path: probe.log}
