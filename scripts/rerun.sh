@@ -15,7 +15,22 @@ mkdir -p "$OUT"
 CRASH_RE='(AddressSanitizer|UndefinedBehaviorSanitizer|MemorySanitizer|LeakSanitizer|libFuzzer: deadly signal|DEADLYSIGNAL|SUMMARY: .*Sanitizer|runtime error:)'
 EXEC_RE='Executed /tmp/poc|Execution successful'
 
-pull() { for t in 1 2 3; do docker pull -q "n132/arvo:$1" >>"$OUT/pull.log" 2>&1 && return 0; sleep 60; done; return 1; }
+# Docker Hub rate-limits anonymous pulls per IP. Try Hub, then Google's Hub mirror (same
+# manifest, so the same digest), backing off up to ~25 minutes before calling it a pull failure.
+pull() {
+  for wait in 60 120 300 600 0; do
+    docker pull -q "n132/arvo:$1" >>"$OUT/pull.log" 2>&1 && return 0
+    if docker pull -q "mirror.gcr.io/n132/arvo:$1" >>"$OUT/pull.log" 2>&1; then
+      docker tag "mirror.gcr.io/n132/arvo:$1" "n132/arvo:$1" && echo "via mirror.gcr.io" >>"$OUT/notes.txt"
+      return 0
+    fi
+    sleep "$wait"
+  done
+  return 1
+}
+# The content digest, written as n132/arvo@sha256:..., whichever registry served the image.
+digest() { docker image inspect --format '{{range .RepoDigests}}{{println .}}{{end}}' "n132/arvo:$1" 2>/dev/null \
+  | sed -n 's/.*@\(sha256:[0-9a-f]*\).*/n132\/arvo@\1/p' | head -1; }
 cap() {  # a binary that loops on output wrote 10 GB per run; keep the head (crash) and tail (marker)
   [ "$(stat -c %s "$1")" -gt 25000000 ] || return 0
   { head -c 20000000 "$1"; printf '\n[CF: truncated]\n'; tail -c 2000000 "$1"; } > "$1.cap" && mv "$1.cap" "$1"
@@ -39,9 +54,10 @@ pull "$ID-fix" || { echo '{"status":"pull_failed","side":"fix"}' >"$OUT/result.j
 V=$(run "$ID-vul" "$OUT/vul.sanitizer.txt")
 F1=$(run "$ID-fix" "$OUT/fix1.sanitizer.txt")
 F2=$(run "$ID-fix" "$OUT/fix2.sanitizer.txt")
-VD=$(docker image inspect --format '{{index .RepoDigests 0}}' "n132/arvo:$ID-vul" 2>/dev/null)
-FD=$(docker image inspect --format '{{index .RepoDigests 0}}' "n132/arvo:$ID-fix" 2>/dev/null)
-docker rmi -f "n132/arvo:$ID-vul" "n132/arvo:$ID-fix" >/dev/null 2>&1
+VD=$(digest "$ID-vul")
+FD=$(digest "$ID-fix")
+docker rmi -f "n132/arvo:$ID-vul" "n132/arvo:$ID-fix" "mirror.gcr.io/n132/arvo:$ID-vul" \
+  "mirror.gcr.io/n132/arvo:$ID-fix" >/dev/null 2>&1
 python3 - "$OUT/result.json" "$ID" "$V" "$F1" "$F2" "$VD" "$FD" <<'PY'
 import json, sys
 out, i, v, f1, f2, vd, fd = sys.argv[1:]
