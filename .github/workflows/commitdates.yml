@@ -1,0 +1,29 @@
+name: commitdates
+on:
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: "List of <owner/repo>\\t<sha> (public commits)"
+        required: true
+jobs:
+  dates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Author date of each commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          while IFS=$'\t' read -r repo sha; do
+            [ -z "$repo" ] && continue
+            d=$(curl -s -H "Authorization: Bearer $GH_TOKEN" "https://api.github.com/repos/$repo/commits/$sha" \
+              | python3 -c "import sys,json
+          try:
+              j=json.load(sys.stdin); print(j['commit']['author']['date'] if j.get('sha')==sys.argv[1] else '')
+          except Exception: print('')" "$sha")
+            printf '%s\t%s\t%s\n' "$repo" "$sha" "$d" >> dates.tsv
+            sleep 0.5
+          done < "${{ github.event.inputs.cases }}"
+      - uses: actions/upload-artifact@v4
+        with: {name: dates, path: dates.tsv}
