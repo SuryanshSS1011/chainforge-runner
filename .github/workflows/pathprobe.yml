@@ -1,0 +1,57 @@
+name: pathprobe
+on:
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: "Encrypted case list (openssl aes-256-cbc -pbkdf2, key in the CF_KEY secret)"
+        required: true
+      shards:
+        description: "Parallel runners"
+        required: true
+        default: "100"
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      shards: ${{ steps.s.outputs.shards }}
+    steps:
+      - id: s
+        run: echo "shards=$(python3 -c "import json;print(json.dumps(list(range(${{ github.event.inputs.shards }}))))")" >> "$GITHUB_OUTPUT"
+  probe:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJson(needs.plan.outputs.shards) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Free disk
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL; docker system prune -af >/dev/null
+      - name: Docker Hub login
+        env:
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        if: env.DOCKERHUB_TOKEN != ''
+        run: echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USER" --password-stdin
+      - name: Probe this shard (sites stay encrypted at rest and out of the log)
+        env:
+          CF_KEY: ${{ secrets.CF_KEY }}
+        run: |
+          openssl enc -d -aes-256-cbc -pbkdf2 -pass env:CF_KEY -in "${{ github.event.inputs.cases }}" -out /tmp/cases.tsv
+          n=${{ github.event.inputs.shards }}; i=0; mkdir -p out
+          while IFS=$'\t' read -r id t rf rl rfn sfn; do
+            [ -z "$id" ] && continue
+            if [ $(( i % n )) -eq ${{ matrix.shard }} ]; then
+              bash scripts/path_probe.sh "$id" "$t" "$rf" "$rl" "$rfn" "$sfn" </dev/null >> out/paths.jsonl
+            fi
+            i=$((i+1))
+          done < /tmp/cases.tsv
+          rm -f /tmp/cases.tsv
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: paths-${{ matrix.shard }}
+          path: out/
+          if-no-files-found: warn
