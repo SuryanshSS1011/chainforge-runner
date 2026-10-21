@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+# PR-13(a) hunk pairs for one ARVO case whose single-hunk test found no sufficient hunk.
+# Rebuild the vulnerable image unmodified (the control), then with every pair of the fix's code
+# hunks applied together (2 to 8 hunks, smallest combined size first, at most 28 pairs),
+# replaying the PoV each time; the first pair that stops the crash is kept. Docker honours the image's WORKDIR and runs as root, which removes the cwd, read-only
+# /out and home-quota failures seen under Apptainer. Every variant gets a fresh container:
+# OSS-Fuzz build.sh is not idempotent. All logs are kept; the verdict is made by CHAINFORGE.
+#
+# Usage: pairs_docker.sh <arvo_id> <project> <patch_url> <outdir>
+set -uo pipefail
+ID="$1"; PROJECT="$2"; URL="$3"; OUT="$4"
+HERE="$(cd "$(dirname "$0")/.." && pwd)"
+mkdir -p "$OUT"; OUT="$(cd "$OUT" && pwd)"   # docker -v needs an absolute path
+log(){ echo "[$ID] $*" >&2; }
+emit(){ printf '%s\n' "$1" > "$OUT/result.json"; exit 0; }
+IMG="n132/arvo:${ID}-vul"
+
+python3 - "$URL" "$OUT/fix.diff" "$HERE" <<'PY' || emit '{"status":"diff_unfetchable"}'
+import sys
+sys.path.insert(0, sys.argv[3] + "/repo/infra/verify")
+from fetch_fix_diffs import fetch
+d = fetch(sys.argv[1])
+if not d:
+    raise SystemExit(1)
+open(sys.argv[2], "w").write(d)
+PY
+python3 "$HERE/repo/infra/verify/split_hunks.py" "$OUT/fix.diff" "$OUT/hunks" > "$OUT/split.log" 2>&1 \
+  || emit '{"status":"hunk_split_failed"}'
+N=$(python3 -c "import json;print(json.load(open('$OUT/hunks/index.json'))['written'])" 2>/dev/null || echo 0)
+[ "$N" -ge 2 ] || emit '{"status":"fewer_than_two_hunks"}'
+[ "$N" -le 8 ] || emit '{"status":"more_than_eight_hunks"}'
+# Docker Hub allows ~200 pulls per 6 h; a 400-case batch exceeds it. Wait out the limit.
+for t in 1 2 3 4 5 6; do
+  docker pull -q "$IMG" > "$OUT/pull.log" 2>&1 && break
+  if grep -qi "toomanyrequests" "$OUT/pull.log"; then sleep 1800; else sleep 60; fi
+done
+docker image inspect "$IMG" >/dev/null 2>&1 || emit '{"status":"image_pull_failed"}'
+log "$N candidate hunks"
+
+variant(){  # <log> [patch] : fresh container, optional patch, full rebuild, replay
+  local P="${2:-}"
+  timeout 7200 docker run --rm ${P:+-v "$P:/tmp/cf_p.patch:ro"} "$IMG" bash -c '
+    if [ -f /tmp/cf_p.patch ]; then
+      # The source tree is not always the WORKDIR (capstonenext builds from /src/capstonenext
+      # out of WORKDIR /src): apply where the patch dry-runs, preferring the project directory.
+      WD=$PWD; at=""
+      for D in "/src/'"$PROJECT"'" "$WD" /src/*/; do
+        for L in 1 0 2; do
+          (cd "$D" 2>/dev/null && patch -p$L --forward --batch --dry-run < /tmp/cf_p.patch >/dev/null 2>&1) \
+            && { at=$D; break 2; }
+        done
+      done
+      [ -n "$at" ] || { echo CF_PATCH_FAIL; cd "$WD"; patch -p1 --forward --batch --dry-run < /tmp/cf_p.patch; exit 9; }
+      (cd "$at" && patch -p$L --forward --batch < /tmp/cf_p.patch > /tmp/p.log 2>&1) || { echo CF_PATCH_FAIL; cat /tmp/p.log; exit 9; }
+      echo "CF_PATCHED_AT $at -p$L"
+      cd "$WD"
+    fi
+    # The image was built once already; a build.sh that runs a bare "mkdir build" dies on the
+    # second build. Make mkdir tolerant; nothing else in build.sh is touched.
+    sed -i -E "s/(^|[;&|[:space:]])mkdir ([^-])/\1mkdir -p \2/" "$SRC/build.sh" 2>/dev/null
+    arvo compile > /tmp/b.log 2>&1 || { echo CF_BUILD_FAIL; tail -40 /tmp/b.log; exit 8; }
+    arvo run 2>&1 | head -80' > "$1" 2>&1
+}
+verdict(){
+  grep -q CF_PATCH_FAIL "$1" && { echo patchfail; return; }
+  grep -q CF_BUILD_FAIL "$1" && { echo buildfail; return; }
+  grep -qE "ERROR: (Address|Memory|Leak)Sanitizer|WARNING: MemorySanitizer|runtime error:|SUMMARY: .*Sanitizer" "$1" \
+    && { echo crashed; return; }
+  # Clean only if the input demonstrably ran (R10): a container that never started also prints
+  # no sanitizer line.
+  grep -qE "Executed /tmp/poc|Execution successful" "$1" \
+    || { grep -q "Accepting input from '/tmp/poc'" "$1" && grep -q "Usage for fuzzing" "$1"; } \
+    && echo clean || echo infrafail
+}
+
+variant "$OUT/control.log"
+CTRL=$(verdict "$OUT/control.log"); log "control -> $CTRL"
+[ "$CTRL" = "crashed" ] || emit "{\"arvo_id\":\"$ID\",\"project\":\"$PROJECT\",\"status\":\"control_$([ "$CTRL" = clean ] && echo did_not_crash || echo infrastructure_failed)\",\"control\":\"$CTRL\"}"
+
+python3 - "$OUT/hunks/index.json" > "$OUT/pairs.tsv" <<'PY'
+import itertools, json, sys
+h = json.load(open(sys.argv[1]))["hunks"]
+pairs = sorted(itertools.combinations(h, 2), key=lambda p: sum(x["added"] + x["removed"] for x in p))
+for a, b in pairs[:28]:
+    print(f"{a['name']}\t{b['name']}")
+PY
+: > "$OUT/pair_results.tsv"
+while IFS=$'\t' read -r A B; do
+  cat "$OUT/hunks/$A" "$OUT/hunks/$B" > "$OUT/pair.patch"
+  L="$OUT/${A%.patch}+${B%.patch}.log"
+  variant "$L" "$OUT/pair.patch"
+  R=$(verdict "$L"); log "  $A + $B -> $R"
+  printf '%s\t%s\t%s\n' "$A" "$B" "$R" >> "$OUT/pair_results.tsv"
+  [ "$R" = clean ] && { cp "$OUT/pair.patch" "$OUT/proving_pair.patch"; break; }
+done < "$OUT/pairs.tsv"
+docker rmi -f "$IMG" >/dev/null 2>&1
+python3 - "$OUT" "$ID" "$PROJECT" "$CTRL" "$N" > "$OUT/result.json" <<'PY'
+import json, sys
+out, aid, project, ctrl, n = sys.argv[1:]
+idx = {x["name"]: x for x in json.load(open(f"{out}/hunks/index.json"))["hunks"]}
+res = [dict(zip(("a", "b", "outcome"), l.rstrip("\n").split("\t")))
+       for l in open(f"{out}/pair_results.tsv") if l.strip()]
+g = next((r for r in res if r["outcome"] == "clean"), None)
+pair = [idx[k] | {"hunk": k} for k in (g["a"], g["b"])] if g else None
+print(json.dumps({"arvo_id": aid, "project": project, "status": "ok", "control": ctrl,
+                  "host": "github-actions", "method": "hunk-pairs", "n_hunks": int(n),
+                  "n_tried": len(res), "results": res, "proving_pair": pair}, indent=1))
+PY
