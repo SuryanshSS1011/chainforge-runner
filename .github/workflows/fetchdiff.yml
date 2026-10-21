@@ -1,0 +1,30 @@
+name: fetchdiff
+on:
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: "Case list (<arvo id>\\t<project>\\t<patch url> per line)"
+        required: true
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch fix diffs
+        run: |
+          mkdir -p out
+          while IFS=$'\t' read -r id project url; do
+            [ -z "$id" ] && continue
+            python3 - "$url" "out/$id.diff" <<'PY' || echo "$id unfetchable"
+          import sys
+          sys.path.insert(0, "repo/infra/verify")
+          from fetch_fix_diffs import fetch
+          d = fetch(sys.argv[1])
+          if not d:
+              raise SystemExit(1)
+          open(sys.argv[2], "w").write(d)
+          PY
+          done < "${{ github.event.inputs.cases }}"
+      - uses: actions/upload-artifact@v4
+        with: {name: diffs, path: out/}
