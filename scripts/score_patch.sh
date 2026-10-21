@@ -21,6 +21,12 @@
 #   not_run     some replay never reached the input: an environment failure, NOT a negative
 #               reward (R10); retry it rather than scoring it
 #
+# With CF_CORPUS=1 and CF_TARGET=<fuzz target> (libFuzzer only), the same container then loads
+# the project's seed corpus (/out/<target>_seed_corpus.zip, at most 2000 inputs) into the
+# patched build with -runs=0 and records libFuzzer's INITED coverage (result.json "corpus").
+# Compared with the unpatched build's figure, it shows a patch that rejects inputs early.
+# It is a shaping signal, not a correctness check (chainforge.reward.coverage_kept).
+#
 # What "clean" proves: the program read this one input to completion under the sanitizer and
 # no report fired. It does not prove the patch fixes the root cause, keeps intended behaviour,
 # or handles other inputs; a patch that rejects the input early also scores clean. Pair it with
@@ -50,7 +56,8 @@ docker image inspect "$IMG" >/dev/null 2>&1 || {
   echo '{"outcome":"not_run","why":"image pull failed"}' >"$OUT/result.json"; exit 0; }
 
 # One container: patch, rebuild once, replay RUNS times. Each replay's output is delimited.
-timeout 7200 docker run --rm "${MNT[@]}" -e CF_RUNS="$RUNS" "$IMG" bash -c '
+timeout 7200 docker run --rm "${MNT[@]}" -e CF_RUNS="$RUNS" -e CF_CORPUS="${CF_CORPUS:-0}" \
+  -e CF_TARGET="${CF_TARGET:-}" "$IMG" bash -c '
   if [ -f /tmp/cf_p.patch ]; then
     WD=$PWD; at=""
     for D in "/src/'"$PROJECT"'" "$WD" /src/*/; do
@@ -75,6 +82,19 @@ timeout 7200 docker run --rm "${MNT[@]}" -e CF_RUNS="$RUNS" "$IMG" bash -c '
     echo "CF_RUN_END $i"
     echo "CF_RUN_SECONDS $i $(( $(date +%s) - t0 ))"
   done
+  if [ "$CF_CORPUS" = 1 ] && [ -n "$CF_TARGET" ] && [ -x "/out/$CF_TARGET" ]; then
+    Z="/out/${CF_TARGET}_seed_corpus.zip"
+    if [ -f "$Z" ]; then
+      mkdir -p /tmp/cz /tmp/corpus && { unzip -qo "$Z" -d /tmp/cz >/dev/null 2>&1 || python3 -m zipfile -e "$Z" /tmp/cz >/dev/null 2>&1; }
+      i=0; find /tmp/cz -type f | sort | head -n 2000 | while read -r f; do cp "$f" "/tmp/corpus/$i"; i=$((i+1)); done
+      echo "CF_CORPUS_INPUTS $(ls /tmp/corpus | wc -l)"
+      timeout 1200 "/out/$CF_TARGET" -runs=0 -timeout=25 -rss_limit_mb=2560 /tmp/corpus 2>&1 \
+        | grep -E "INITED|ERROR: (Address|Memory|UndefinedBehavior)Sanitizer|deadly signal|runtime error:" | head -5 \
+        | sed "s/^/CF_CORPUS_LINE /"
+    else
+      echo "CF_CORPUS_NONE no seed corpus for $CF_TARGET"
+    fi
+  fi
   # Peak memory of this container (cgroup v2), for the README resource figures.
   echo "CF_PEAK_MEM_BYTES $(cat /sys/fs/cgroup/memory.peak 2>/dev/null || echo 0)"' >"$OUT/score.log" 2>&1
 
@@ -111,6 +131,15 @@ res["resources"] = {
     "replay_seconds": [int(x) for x in re.findall(r"CF_RUN_SECONDS \d+ (\d+)", log)],
     "peak_memory_bytes": int(mem.group(1)) if mem and mem.group(1) != "0" else None,
 }
+if "CF_CORPUS_INPUTS" in log or "CF_CORPUS_NONE" in log:
+    n = re.search(r"CF_CORPUS_INPUTS (\d+)", log)
+    i = re.search(r"CF_CORPUS_LINE .*INITED cov: (\d+) ft: (\d+)", log)
+    res["corpus"] = {
+        "inputs": int(n.group(1)) if n else 0,
+        "cov": int(i.group(1)) if i else None,
+        "ft": int(i.group(2)) if i else None,
+        "crashed": bool(re.search(r"CF_CORPUS_LINE .*(Sanitizer|deadly signal|runtime error)", log)),
+    }
 json.dump(res, open(f"{out}/result.json", "w"), indent=1)
 print(res["outcome"], res["runs"])
 PY

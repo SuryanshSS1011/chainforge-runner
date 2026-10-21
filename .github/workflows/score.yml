@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       cases:
-        description: "Case list (<arvo id>\t<project>\t<patch url> per line), path in this repo"
+        description: "Case list (<arvo id>\t<project>\t<patch url>[\t<fuzz target>] per line), path in this repo"
         required: true
         default: "cases/smoke.txt"
       shards:
@@ -47,10 +47,10 @@ jobs:
         run: |
           n=${{ github.event.inputs.shards }}
           i=0
-          while IFS=$'\t' read -r id project url; do
+          while IFS=$'\t' read -r id project url target; do
             [ -z "$id" ] && continue
             if [ $(( i % n )) -eq ${{ matrix.shard }} ]; then
-              bash scripts/score_smoke.sh "$id" "$project" "$url" "out/$id" </dev/null || true
+              bash scripts/score_smoke.sh "$id" "$project" "$url" "out/$id" "$target" </dev/null || true
             fi
             i=$((i+1))
           done < "${{ github.event.inputs.cases }}"
