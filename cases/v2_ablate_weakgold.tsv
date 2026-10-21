@@ -1,0 +1,39 @@
+394126186	tarantool	https://github.com/tarantool/luajit/commit/58dcabe695e8b4d8c604f7f73948061fa7dbabcd
+42472620	wireshark	https://github.com/wireshark/wireshark/commit/22f05d620f428c0769227f0173876c95fb9aead4
+42473267	capstonenext	https://github.com/aquynh/capstone/commit/a0d5ab7ba202341af74309fae3b1bf88284101bb
+42477643	libhevc	https://android.googlesource.com/platform/external/libhevc/+/d28f2210ee8e65afdfb07a1fd6582285d3d178e0%5E%21/
+42477679	libhevc	https://android.googlesource.com/platform/external/libhevc/+/d28f2210ee8e65afdfb07a1fd6582285d3d178e0%5E%21/
+42480361	opus	https://gitlab.xiph.org/xiph/opus/-/commit/aef369f536ecb89ab94c2c6bc6b6e0a767fab39d
+42480411	samba	https://gitlab.com/samba-team/samba/-/commit/f11e207e01c52566c47e350ff240fe95392de0c3
+42480457	wireshark	https://github.com/wireshark/wireshark/commit/c247a8351f4d2be224e8cc424e104d8823450f5d
+42480471	opus	https://gitlab.xiph.org/xiph/opus/-/commit/aef369f536ecb89ab94c2c6bc6b6e0a767fab39d
+42480504	opus	https://gitlab.xiph.org/xiph/opus/-/commit/aef369f536ecb89ab94c2c6bc6b6e0a767fab39d
+42481187	samba	https://gitlab.com/samba-team/samba/-/commit/14182350f8397d27d7642dae595dc52691f0acfe
+42483290	oniguruma	https://github.com/kkos/oniguruma/commit/8b8b37ef8864a976641d4382293de7fe3d5edd62
+42490882	aac	https://android.googlesource.com/platform/external/aac//+/a7c64ff42f1c67960acb9686555ecbc683e3762c%5E%21/
+42498183	netcdf-c	https://github.com/Unidata/netcdf-c/commit/efdec07f3d9b54bc0b4b5ec93b05c7870dfd4539
+42498712	dnsmasq	git://thekelleys.org.uk/dnsmasq.git -> 41adecad14af8a4255bfd47a79b86b6834a1b5d6
+42498716	dnsmasq	git://thekelleys.org.uk/dnsmasq.git -> 41adecad14af8a4255bfd47a79b86b6834a1b5d6
+42498720	dnsmasq	git://thekelleys.org.uk/dnsmasq.git -> 7b80c75d9d3c19d8d328f749c06d06788ddb63fc
+42500694	httpd	https://github.com/apache/httpd/commit/beec41a39a7206a8ed95d6aac31631a2f10118cd
+42502928	freeradius-server	https://github.com/FreeRADIUS/freeradius-server/commit/1def06002d0722f02e396ee83e900ee4a011ad4d
+42504404	httpd	https://github.com/apache/httpd/commit/6b1247e8a6ce5708d57187cb33db5f6da96f86dc
+42508233	libredwg	https://github.com/LibreDWG/libredwg/commit/fe03c5a89cbd441b6840335bd484cf08bc65c7c4
+42511577	moddable	https://github.com/Moddable-OpenSource/moddable/commit/05f55eeb219ff43373eebe904819c55276b3e393
+42513703	moddable	https://github.com/Moddable-OpenSource/moddable/commit/99e56395fb17b9c8c60e2eceae3b484f842a2b20
+42518303	libjpeg-turbo.dev	https://github.com/libjpeg-turbo/libjpeg-turbo/commit/98ff1fd10306d031cfcf8a6becf78b3ac0afe49b
+42520431	libjpeg-turbo.dev	https://github.com/libjpeg-turbo/libjpeg-turbo/commit/9b3a8f36418e8b6a601aa683506bb875f6dd9f12
+42522531	hdf5	https://github.com/HDFGroup/hdf5/commit/ce53bc020d37e10a06a59501c45f1ab82539f0c5
+42523342	c-blosc2	https://github.com/Blosc/c-blosc2/commit/fa5e3f4c5c645e315be0f998679b8e73b7d42680
+42523993	hdf5	https://github.com/HDFGroup/hdf5/commit/ce53bc020d37e10a06a59501c45f1ab82539f0c5
+42524018	hdf5	https://github.com/HDFGroup/hdf5/commit/ce53bc020d37e10a06a59501c45f1ab82539f0c5
+42524740	hdf5	https://github.com/HDFGroup/hdf5/commit/ce53bc020d37e10a06a59501c45f1ab82539f0c5
+42525184	hdf5	https://github.com/HDFGroup/hdf5/commit/ce53bc020d37e10a06a59501c45f1ab82539f0c5
+42526388	c-blosc2	https://github.com/Blosc/c-blosc2/commit/fa5e3f4c5c645e315be0f998679b8e73b7d42680
+42527328	hdf5	https://github.com/HDFGroup/hdf5/commit/ce53bc020d37e10a06a59501c45f1ab82539f0c5
+42527526	hdf5	https://github.com/HDFGroup/hdf5/commit/ce53bc020d37e10a06a59501c45f1ab82539f0c5
+42527895	hdf5	https://github.com/HDFGroup/hdf5/commit/ce53bc020d37e10a06a59501c45f1ab82539f0c5
+42529681	hdf5	https://github.com/HDFGroup/hdf5/commit/ce53bc020d37e10a06a59501c45f1ab82539f0c5
+42530550	hdf5	https://github.com/HDFGroup/hdf5/commit/ce53bc020d37e10a06a59501c45f1ab82539f0c5
+42534125	hdf5	https://github.com/HDFGroup/hdf5/commit/ce53bc020d37e10a06a59501c45f1ab82539f0c5
+42534620	freetype	https://github.com/freetype/freetype/commit/dbdcd758895647028bbc56baf862a1cff07409ff
