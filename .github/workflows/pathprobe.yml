@@ -41,10 +41,10 @@ jobs:
         run: |
           openssl enc -d -aes-256-cbc -pbkdf2 -pass env:CF_KEY -in "${{ github.event.inputs.cases }}" -out /tmp/cases.tsv
           n=${{ github.event.inputs.shards }}; i=0; mkdir -p out
-          while IFS=$'\t' read -r id t rf rl rfn sfn sf; do
+          while IFS=$'\t' read -r id t rf rl rfn sfn sf sl; do
             [ -z "$id" ] && continue
             if [ $(( i % n )) -eq ${{ matrix.shard }} ]; then
-              bash scripts/path_probe.sh "$id" "$t" "$rf" "$rl" "$rfn" "$sfn" "$sf" </dev/null >> out/paths.jsonl
+              bash scripts/path_probe.sh "$id" "$t" "$rf" "$rl" "$rfn" "$sfn" "$sf" "$sl" </dev/null >> out/paths.jsonl
             fi
             i=$((i+1))
           done < /tmp/cases.tsv

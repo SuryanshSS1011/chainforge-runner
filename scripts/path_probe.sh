@@ -11,12 +11,12 @@
 #
 # Usage: path_probe.sh <arvo_id> <target> <root_file_base> <root_line> <root_fn> <sink_fn> [sink_file_base]
 set -uo pipefail
-ID="$1"; T="$2"; RF="$3"; RL="$4"; RFN="$5"; SFN="$6"; SF="${7:-}"
+ID="$1"; T="$2"; RF="$3"; RL="$4"; RFN="$5"; SFN="$6"; SF="${7:-}"; SL="${8:-}"
 IMG="n132/arvo:${ID}-vul"
 for w in 60 300 0; do docker pull -q "$IMG" >/dev/null 2>&1 && break; sleep $w; done
 docker image inspect "$IMG" >/dev/null 2>&1 || { echo "{\"arvo_id\":\"$ID\",\"status\":\"pull_failed\"}"; exit 0; }
 W=$(mktemp -d); chmod 777 "$W"
-timeout 1500 docker run --rm -v "$W:/pp" -e T="$T" -e RF="$RF" -e RL="$RL" -e RFN="$RFN" -e SFN="$SFN" -e SF="$SF" "$IMG" bash -c '
+timeout 1500 docker run --rm -v "$W:/pp" -e T="$T" -e RF="$RF" -e RL="$RL" -e RFN="$RFN" -e SFN="$SFN" -e SF="$SF" -e SL="$SL" "$IMG" bash -c '
   (command -v gdb || (apt-get update -qq && apt-get install -y -qq gdb)) >/dev/null 2>&1
   command -v gdb >/dev/null || { echo no_gdb > /pp/status; exit 0; }
   B="/out/$T"
@@ -49,7 +49,11 @@ timeout 1500 docker run --rm -v "$W:/pp" -e T="$T" -e RF="$RF" -e RL="$RL" -e RF
     printf "set pagination off\nset confirm off\nset breakpoint pending on\n"
     ok "$RL" && printf "echo @@line\\\\n\nbreak %s:%s\n" "$RF" "$RL"
     ok "$RFN" && { printf "echo @@func\\\\n\n"; fn "$RFN" "$RF"; }
-    ok "$SFN" && { printf "echo @@sink\\\\n\n"; fn "$SFN" "$SF"; }
+    # The control is the sink function; an inlined sink has no symbol to break on, so its
+    # report line (file:line, which line tables keep for inlined code) stands in for it.
+    sk=""; ok "$SFN" && sk=$(fn "$SFN" "$SF")
+    if [ -z "$sk" ] && ok "$SF" && ok "$SL" && resolves "break $SF:$SL"; then sk="break $SF:$SL"; fi
+    [ -n "$sk" ] && printf "echo @@sink\\\\n\n%s\n" "$sk"
     printf "echo @@end\\\\n\n"
     printf "commands 1-\$bpnum\nsilent\ncontinue\nend\n"
     printf "run\ninfo breakpoints\nquit\n"
