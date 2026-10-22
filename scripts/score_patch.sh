@@ -3,7 +3,13 @@
 # can use. This is the IMPLEMENTED reward signal; nothing here judges root cause or semantics.
 #
 #   1. start a fresh container of the record's VULNERABLE image (pin it by digest for training);
-#   2. apply the candidate patch where it dry-runs (project dir first, -p1/-p0/-p2);
+#   2. apply the candidate patch where it dry-runs (project dir first, -p1/-p0/-p2); if the
+#      whole patch applies nowhere, apply it file by file, each where it dry-runs (a fix can span
+#      repositories under /src). A file may be left out only if the image cannot build from it:
+#      it is absent from the image, or it is neither code nor build glue (docs, CI, changelogs,
+#      test data). Any code or build file that exists and does not apply is `patch_fail`.
+#      The same rule holds for a policy's patch and the developer's; result.json "apply" lists
+#      every file and what happened to it;
 #   3. rebuild with the image's own build (`arvo compile`);
 #   4. replay the record's crashing input RUNS times (default 2, as GOLD's patched side);
 #   5. classify each replay exactly as the GOLD pipeline does:
@@ -17,7 +23,7 @@
 #   pass        patch applied, build succeeded, every replay clean
 #   crash       at least one replay crashed (the witnessed bug, or another sanitizer report)
 #   build_fail  the patched tree did not build
-#   patch_fail  the patch applies nowhere
+#   patch_fail  a code or build file the image contains could not be patched
 #   not_run     some replay never reached the input: an environment failure, NOT a negative
 #               reward (R10); retry it rather than scoring it
 #
@@ -49,6 +55,33 @@ MNT=()
 if [ "$PATCH" != "-" ]; then
   PATCH="$(cd "$(dirname "$PATCH")" && pwd)/$(basename "$PATCH")"
   MNT=(-v "$PATCH:/tmp/cf_p.patch:ro")
+  # One patch per file, for the file-by-file fallback (the image may have no python3).
+  rm -rf "$OUT/files"; mkdir -p "$OUT/files"
+  python3 - "$PATCH" "$OUT/files" <<'PY'
+import re, sys
+from pathlib import Path
+text, out = Path(sys.argv[1]).read_text(errors="replace"), Path(sys.argv[2])
+CODE = re.compile(r"\.(c|cc|cpp|cxx|c\+\+|h|hh|hpp|hxx|inc|ipp|inl|S|s|asm)$", re.I)
+BUILD = re.compile(
+    r"(^|/)(CMakeLists\.txt|Makefile[^/]*|GNUmakefile|meson\.build|meson_options\.txt|BUILD(\.gn|\.bazel)?"
+    r"|configure(\.ac|\.in)?|build\.sh|Kconfig[^/]*|Kbuild)$|\.(am|ac|mk|cmake|gn|gni|gyp|gypi|bzl|pro|pri)$",
+    re.I,
+)
+parts = re.split(r"(?m)^(?=diff --git )", text)
+rows = []
+for part in parts:
+    m = re.match(r"diff --git a/(\S+) b/(\S+)", part)
+    if not m:
+        continue
+    path = m.group(2)
+    kind = "code" if CODE.search(path) else "build" if BUILD.search(path) else "other"
+    new = "new" if re.search(r"(?m)^(new file mode|--- /dev/null)", part) else "old"
+    n = len(rows)
+    (out / f"{n:03d}.patch").write_text(part)
+    rows.append(f"{n:03d}\t{kind}\t{new}\t{path}")
+(out / "index.tsv").write_text("\n".join(rows) + ("\n" if rows else ""))
+PY
+  MNT+=(-v "$OUT/files:/tmp/cf_files:ro")
 fi
 
 for t in 1 2 3; do docker pull -q "$IMG" >"$OUT/pull.log" 2>&1 && break; sleep 60; done
@@ -59,16 +92,56 @@ docker image inspect "$IMG" >/dev/null 2>&1 || {
 timeout 7200 docker run --rm "${MNT[@]}" -e CF_RUNS="$RUNS" -e CF_CORPUS="${CF_CORPUS:-0}" \
   -e CF_TARGET="${CF_TARGET:-}" "$IMG" bash -c '
   if [ -f /tmp/cf_p.patch ]; then
-    WD=$PWD; at=""
-    for D in "/src/'"$PROJECT"'" "$WD" /src/*/; do
-      for L in 1 0 2; do
-        (cd "$D" 2>/dev/null && patch -p$L --forward --batch --dry-run < /tmp/cf_p.patch >/dev/null 2>&1) \
-          && { at=$D; break 2; }
+    WD=$PWD
+    # Where a patch dry-runs: the project directory first, then the working directory, then
+    # every repository under /src, at -p1, -p0, -p2.
+    where() {
+      for D in "/src/'"$PROJECT"'" "$WD" /src/*/; do
+        for L in 1 0 2; do
+          (cd "$D" 2>/dev/null && patch -p$L --fuzz=$2 --forward --batch --dry-run < "$1" >/dev/null 2>&1) \
+            && { echo "$D $L"; return 0; }
+        done
       done
+      return 1
+    }
+    # Strict first: context must match exactly (offsets allowed). Only if that fails anywhere,
+    # GNU patch default fuzz (2 context lines may mismatch), which result.json reports, because a
+    # fuzzed hunk can land where its context does not match.
+    ok=0
+    for FZ in 0 2; do
+      if loc=$(where /tmp/cf_p.patch $FZ); then
+        set -- $loc
+        (cd "$1" && patch -p$2 --fuzz=$FZ --forward --batch < /tmp/cf_p.patch > /tmp/p.log 2>&1) || { echo CF_PATCH_FAIL; cat /tmp/p.log; exit 9; }
+        echo "CF_PATCHED_AT $1 -p$2"; echo "CF_APPLY_MODE whole"; echo "CF_APPLY_FUZZ $FZ"; ok=1; break
+      fi
+      # File by file, each where it dry-runs. A file is left out only if the image cannot build
+      # from it: absent from the image, or neither code nor build glue.
+      [ -s /tmp/cf_files/index.tsv ] || continue
+      # Dry-run every file first and apply only if all are placed, so a failed strict attempt
+      # leaves the tree untouched for the lenient one.
+      plan=""; out=""; fail=0
+      while IFS="$(printf "\t")" read -r n kind new path; do
+        if loc=$(where /tmp/cf_files/$n.patch $FZ); then
+          plan="$plan$n $loc;"; out="$out CF_APPLY $n applied;"; continue
+        fi
+        exists=0
+        for D in "/src/'"$PROJECT"'" "$WD" /src/*/; do
+          { [ -e "$D/$path" ] || [ -e "$D/${path#*/}" ]; } && { exists=1; break; }
+        done
+        if [ "$kind" = other ]; then out="$out CF_APPLY $n skipped_not_built;"
+        elif [ "$exists" = 0 ] && [ "$new" = old ]; then out="$out CF_APPLY $n skipped_absent;"
+        else out="$out CF_APPLY $n failed;"; fail=1
+        fi
+      done < /tmp/cf_files/index.tsv
+      [ "$fail" = 0 ] || continue
+      echo "$plan" | tr ";" "\n" | grep . | while read -r n D L; do
+        (cd "$D" && patch -p$L --fuzz=$FZ --forward --batch < /tmp/cf_files/$n.patch >/dev/null 2>&1) || echo "CF_APPLY $n failed_on_apply"
+      done > /tmp/apply_err
+      [ -s /tmp/apply_err ] && { cat /tmp/apply_err; echo CF_PATCH_FAIL; exit 9; }
+      echo "CF_APPLY_MODE per-file"; echo "CF_APPLY_FUZZ $FZ"
+      echo "$out" | tr ";" "\n" | sed "s/^ *//" | grep .; ok=1; break
     done
-    [ -n "$at" ] || { echo CF_PATCH_FAIL; exit 9; }
-    (cd "$at" && patch -p$L --forward --batch < /tmp/cf_p.patch > /tmp/p.log 2>&1) || { echo CF_PATCH_FAIL; cat /tmp/p.log; exit 9; }
-    echo "CF_PATCHED_AT $at -p$L"
+    [ "$ok" = 1 ] || { echo CF_PATCH_FAIL; echo "$out" | tr ";" "\n"; exit 9; }
     cd "$WD"
   fi
   sed -i -E "s/(^|[;&|[:space:]])mkdir ([^-])/\1mkdir -p \2/" "$SRC/build.sh" 2>/dev/null
@@ -111,6 +184,22 @@ def classify(t):
         return "clean"
     return "not_run"
 res = {"patch": None if patch == "-" else patch, "runs": []}
+mode = re.search(r"CF_APPLY_MODE (\S+)", log)
+if mode:
+    idx = {}
+    try:
+        for line in open(f"{out}/files/index.tsv"):
+            n, kind, new, path = line.rstrip("\n").split("\t")
+            idx[n] = {"file": path, "kind": kind}
+    except OSError:
+        pass
+    status = dict(re.findall(r"CF_APPLY (\d{3}) (\S+)", log))
+    res["apply"] = {
+        "mode": mode.group(1),
+    "fuzz": int(fz.group(1)) if (fz := re.search(r"CF_APPLY_FUZZ (\d)", log)) else None,
+        "files": [v | {"status": status.get(k, "applied" if mode.group(1) == "whole" else "not tried")}
+                  for k, v in sorted(idx.items())],
+    }
 if "CF_PATCH_FAIL" in log:
     res["outcome"] = "patch_fail"
 elif "CF_BUILD_FAIL" in log:
