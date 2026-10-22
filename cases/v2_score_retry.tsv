@@ -1,0 +1,341 @@
+42470341	graphicsmagick	https://foss.heptapod.net/graphicsmagick/graphicsmagick90ff9f04a465b7f797c23799afdd3d45c45f07ce	
+42470537	libssh	https://git.libssh.org/projects/libssh.git07f7fa7806e94ccaa271c185213afed80e13a77d	libssh_server_fuzzer
+42471116	libarchive	https://github.com/libarchive/libarchive/commit/b52dd6c9e4ef7cf95c2a6ae5ab7ccac7f6d462a1	
+42471192	harfbuzz	https://github.com/harfbuzz/harfbuzz/commit/aa5af8d041521507f8bc8ded8a365ee56098388c	
+42472316	h2o	https://github.com/h2o/h2o/commit/55438dbf9c5be844d1c06e707ef26813bb9f7d92	
+42472610	gdal	https://github.com/OSGeo/gdal/commit/d7e1da18851695b9c865dccbcb24560c744f9f26	gdal_translate_fuzzer
+42472620	wireshark	https://github.com/wireshark/wireshark/commit/22f05d620f428c0769227f0173876c95fb9aead4	fuzzshark_ip_proto-udp
+42472727	libarchive	https://github.com/libarchive/libarchive/commit/4bd12b6f40cb4413c8970c52f15f3b6885b5e32f	
+42472923	openthread	https://github.com/openthread/openthread/commit/249bc598748ad08a98b08995698669613594e54b	
+42473094	poppler	https://gitlab.freedesktop.org/poppler/poppler.gitb54e1fc3e0d2600621a28d50f9f085b9e38619c2	pdf_fuzzer
+42473267	capstonenext	https://github.com/aquynh/capstone/commit/a0d5ab7ba202341af74309fae3b1bf88284101bb	fuzz_disasmnext
+42473294	readstat	https://github.com/WizardMac/ReadStat/commit/66a890faa54ef9c90f83f696795e0df8f1a29c1b	
+42474568	radare2	https://github.com/radare/radare2/commit/67d531dce9df1630387a870833cfdb6cd707ee9c	ia_fuzz
+42475016	lwan	https://github.com/lpereira/lwan/commit/8feaf5303d43cad4d057a51722713213d3c9732c	request_fuzzer
+42475421	gdal	https://github.com/OSGeo/gdal/commit/95762d18d4a7c2a975e82c67fc3dff5eb8028eb0	gdal_translate_fuzzer
+42475493	karchive	https://invent.kde.org/frameworks/karchive/-/commit/5dedab8cb9ec5acb94d6f9957f0f3494f59a3316	karchive_fuzzer
+42475993	hostap	https://w1.fi/cgit/hostap/commit/?id=ce11c281ad1de25a815d49a29043d127cbc6354d	
+42476041	hostap	https://w1.fi/cgit/hostap/commit/?id=ce11c281ad1de25a815d49a29043d127cbc6354d	x509
+42479123	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/bbf9a0b5eef3599a1c6a7a3bea40da9f2c37df83	
+42479556	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/efea62b44631289f995db16faf70979d6592580b	fuzz_disassemble
+42480444	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/f00901886d0acb7a4d4b177a5cabe8bd9ca2307b	fuzz_disassemble
+42481498	hostap	https://w1.fi/cgit/hostap/commit/?id=76162b18280b174cd5e7101c9678f69785409fa3	x509
+42481812	njs	http://hg.nginx.org/njs9b70f038abfa8036d1d8a84d2d8db7c98039a957	
+42482100	njs	http://hg.nginx.org/njs3313d0d593a09f27b7aab54c70dc808c61021ac5	
+42484402	libraw	https://github.com/libraw/libraw/commit/e70ded8b0bc231f7ed3fd5d2e83d61bd18ef5e94	libraw_fuzzer
+42484795	muparser	https://github.com/beltoforion/muparser/commit/86de758d6ebe9b84ae2f65bea640211dd8900ec4	set_eval_fuzzer
+42487533	njs	http://hg.nginx.org/njs98f436565ddf8dd14fe4a5291324137672b50b3b	
+42487554	hermes	https://github.com/facebook/hermes/commit/c593863a881796f8bf4f4faea1fa179edf5d532f	fuzzer-jsi-entry
+42487789	libsndfile	https://github.com/libsndfile/libsndfile/commit/a9815b3f228df00086e0a40bcc43162fc19896a1	sndfile_fuzzer
+42488035	fluent-bit	https://github.com/fluent/fluent-bit/commit/979a9bb728b490659e7e6076c17f3e4cb2c5bd59	flb-it-fuzz-msgpack_parse_fuzzer_OSSFUZZ
+42488618	simdjson	https://github.com/simdjson/simdjson/commit/a8bf10ea5a0ea2553f07ac46744666c94d0085fc	fuzz_dump
+42488680	arrow	https://github.com/apache/arrow/commit/64396aa487fc24cd26b62a9b92e13a952c6ecf74	
+42489926	draco	https://github.com/google/draco/commit/c2d57bc9de5c0a2de0a25a6354e930380c27f372	draco_pc_decoder_without_dequantization_fuzzer
+42490020	rdkit	https://github.com/rdkit/rdkit/commit/e2b0a850d7f7087efc15181b8ab11a6b8a566228	mol_deserialization_fuzzer
+42490495	selinux	https://github.com/SELinuxProject/selinux/commit/228c06d97a8a33b60b89ded17acbd0e92cca9cfe	secilc-fuzzer
+42490721	php-src	https://github.com/php/php-src/commit/c56701690a184c13fa850e9946f09bac7172c604	php-fuzz-execute
+42490848	mdbtools	https://github.com/mdbtools/mdbtools/commit/78bbf4250ecc510c46274300b6f7fed73140147b	fuzz_mdb
+42490855	mdbtools	https://github.com/mdbtools/mdbtools/commit/50c9bdfee62ea54e33da6ae54ad9395e3042d581	fuzz_mdb
+42490882	aac	https://android.googlesource.com/platform/external/aac//+/a7c64ff42f1c67960acb9686555ecbc683e3762c%5E%21/	
+42491082	wolfssl	https://github.com/wolfssl/wolfssl/commit/81f70fba5f6f3fd4715cbe1d51e3b7e76ce22b5d	cryptofuzz-sp-math-all
+42491330	jbig2dec	git://git.ghostscript.com/jbig2dec.git3a2a6a5edf61df4cb64f0180146f8ab9c5380999	jbig2_fuzzer
+42491511	igraph	https://github.com/igraph/igraph/commit/883bd139af3775d7f90f144c9038a6cb9a28f309	
+42491594	selinux	https://github.com/SELinuxProject/selinux/commit/5681c6275b5ad9cf3d84af243a66b900a0628f72	secilc-fuzzer
+42491698	matio	https://github.com/tbeu/matio/commit/b8156d287254b2fca00f266d4b5b12d982329625	matio_fuzzer
+42491771	lua	https://github.com/lua/lua/commit/2bfa13e520e53210b96ead88f49a9ca20c5a5d18	fuzz_lua
+42491796	fio	https://github.com/axboe/fio/commit/465767437da1bcf99a375295799d33948d9fc5f0	
+42491941	libssh2	https://github.com/libssh2/libssh2/commit/cde13f6201c56cc571489a7d7164b7205d688cf9	
+42492011	htslib	https://github.com/samtools/htslib/commit/40afaaa5bf7e3f9cd6d6d9d9d8ae26496df82aea	
+42492195	relic	https://github.com/relic-toolkit/relic/commit/bba5b5fa5489706ab4eaf5d7d0c2550e0a9722c0	cryptofuzz-relic
+42492406	wolfmqtt	https://github.com/wolfSSL/wolfMQTT/commit/9af08af3d162e455c4da5df98b7305a06cef9ab6	wolfmqtt-fuzzer
+42492491	libssh2	https://github.com/libssh2/libssh2/commit/cde13f6201c56cc571489a7d7164b7205d688cf9	
+42492569	relic	https://github.com/relic-toolkit/relic/commit/1cca0a522ca280c7c8ba5e1288a54d9ecde627b4	cryptofuzz-relic
+42492641	ndpi	https://github.com/ntop/nDPI/commit/1ec621c85b9411cc611652fd57a892cfef478af3	fuzz_process_packet
+42492801	relic	https://github.com/relic-toolkit/relic/commit/707708d83188b04ea0b7b0ae2487aa8ac7e62f41	cryptofuzz-relic
+42493482	openjpeg	https://github.com/uclouvain/openjpeg/commit/a55c024fc6b917a409b85aeafd7326421c4aea34	opj_decompress_fuzzer
+42493685	md4c	https://github.com/mity/md4c/commit/260cd3394d45bd51f2002936a63401419658ecd7	fuzz-mdhtml
+42493686	md4c	https://github.com/mity/md4c/commit/f436c3029850c138e54a0de055d61db45130409e	fuzz-mdhtml
+42493694	libiec61850	https://github.com/mz-automation/libiec61850/commit/aac6caaa22c2c6f017d3926856c54646155ff898	fuzz_mms_decode
+42493820	libredwg	https://github.com/LibreDWG/libredwg/commit/8b60f5697ce7ed7f66577e8324b2cfd7dd417ece	llvmfuzz
+42493861	irssi	https://github.com/irssi/irssi/commit/4c069f5c8f3b63d8ba8556ba8292e1f5972508d6	
+42493955	libredwg	https://github.com/LibreDWG/libredwg/commit/f086e9d99f0ce1551348df57d6db9b904c2812be	llvmfuzz
+42494156	libavc	https://android.googlesource.com/platform/external/libavc/+/de9c6cefb626803279d217590ad19255f48ff4d0%5E%21/	avc_dec_fuzzer
+42494529	selinux	https://github.com/SELinuxProject/selinux/commit/d155b410d4bbc90d28f361b966f0429598da8188	secilc-fuzzer
+42494800	c-blosc2	https://github.com/Blosc/c-blosc2/commit/e670bb4036fd7c840b1c206b8739f292346b1aa9	decompress_frame_fuzzer
+42494812	freeimage-svn	https://svn.code.sf.net/p/freeimage/svn1895	
+42494822	gpac	https://github.com/gpac/gpac/commit/b1a2e4127c1242a0fbb5d9b652d678b6508919dc	
+42495298	libredwg	https://github.com/LibreDWG/libredwg/commit/e5be5a65d8473d490333bc6124e0879147f13609	
+42495356	skcms	https://skia.googlesource.com/skcms.git/+/411e27776f5c0ec8359508f0e2cabb1538375e53%5E%21/	
+42495584	libucl	https://github.com/vstakhov/libucl/commit/54a5b5943b49060d4ca7b345bc80f9b0cb2cdc94	ucl_add_string_fuzzer
+42495611	qt	https://code.qt.io/cgit/qt/qtbase.git/commit/?id=fb0fcd7fe3f94a227dd66a110f5a3353008e37e5	qtbase_corelib_time_qdatetime_fromstring
+42495624	wasm3	https://github.com/wasm3/wasm3/commit/60fdd9ecd84b841351059dbfb962a32f616e376e	fuzzer
+42495655	qt	https://code.qt.io/cgit/qt/qtbase.git/commit/?id=964f91fd25a59654905c5a68d3cbccedab9ebb5a	qtbase_corelib_time_qdatetime_fromstring
+42495741	wasm3	https://github.com/wasm3/wasm3/commit/e7084d13903029784f74706cd8fdd70277d2ecab	
+42495755	wasm3	https://github.com/wasm3/wasm3/commit/79255ba1dbbb476e57a5f450eb0bbe1b84ef0f01	
+42495884	libtiff	https://gitlab.com/libtiff/libtiff/-/commit/0be27041a3653f3fb2ae2a71495c18f7f938a661	tiff_read_rgba_fuzzer
+42495891	wasm3	https://github.com/wasm3/wasm3/commit/b48695bb940e55c0baa0a3d5740cf48e03643b58	fuzzer
+42495987	wasm3	https://github.com/wasm3/wasm3/commit/715a8d04df0a4b07de08213999037f3a028f2ab2	fuzzer
+42496153	wasm3	https://github.com/wasm3/wasm3/commit/8f3986a66c390e1125493531648b828099fab982	
+42496155	lxc	https://github.com/lxc/lxc/commit/2e5c468aa59b6458d2894e7b5c730ca251e84b57	fuzz-lxc-define-load
+42496798	pcl	https://github.com/PointCloudLibrary/pcl/commit/3f897554837966b71aa3bfd72dd7ce482e5e55ae	ply_reader_fuzzer
+42496870	json	https://github.com/nlohmann/json/commit/871cebaf84d4f896bc730a92937f8d02e09b0023	fuzzer-parse_cbor
+42496932	duckdb	https://github.com/duckdb/duckdb/commit/f9703e7af9c5edb4d1eebeb1964cdcf78b3980ae	
+42497168	vlc	https://github.com/videolan/vlc/commit/bf1ba89a400038deee7742c97327037bbd58f1d3	
+42497751	fuzzing	https://github.com/google/fuzzing/commit/748de3eed506a515840fcea85fb1c0c22c170c2a	pidgin_utils_fuzzer
+42498183	netcdf-c	https://github.com/Unidata/netcdf-c/commit/efdec07f3d9b54bc0b4b5ec93b05c7870dfd4539	fuzz_open
+42498298	libssh	https://git.libssh.org/projects/libssh.git06799453835d2c6608c074823ccfc399ccc0c525	ssh_client_fuzzer
+42498744	dnsmasq	git://thekelleys.org.uk/dnsmasq.git -> 41adecad14af8a4255bfd47a79b86b6834a1b5d6	
+42498959	libpng	https://github.com/glennrp/libpng/commit/a3d1057a735d923626f1f6bdc0f662a13d0cba6f	libpng_read_fuzzer
+42499700	httpd	https://svn.apache.org/repos/asf/httpd/httpd/trunk1892012	
+42500429	nginx	http://hg.nginx.org/nginx/01829d1620956241455867fd8ba28ba54eed5aa9	http_request_fuzzer
+42501349	freeimage-svn	https://svn.code.sf.net/p/freeimage/svn1907	load_from_memory_fuzzer
+42502136	gdbm	https://git.gnu.org.ua/gdbm.git/commit/?id=ca7194987388a825f57fdebd73eb9c491a8749b0	
+42509561	elfutils	https://sourceware.org/git/?p=elfutils.git;a=commitdiff;h=ed42e7cf11ddb11ffcce9e17276476e0c3d14c71	
+42511896	ndpi	https://github.com/ntop/nDPI/commit/9040bc74c94dbd44cd86b29ec3de40621df53467	fuzz_process_packet
+42512155	tmux	https://github.com/tmux/tmux/commit/6d0828b81cd39362869155dbea0143b66efe4e21	input-fuzzer
+42513222	quickjs	https://github.com/bellard/quickjs/commit/a0570086c698f78ec829cafd7d8d7ac3906abbc1	fuzz_eval
+42513913	lcms	https://github.com/mm2/Little-CMS/commit/f3f6b7bceb629bc4b6f1dea3e45b44dc3f8674af	cms_transform_all_fuzzer
+42514031	aom	https://aomedia.googlesource.com/aom/+/8cc8160a5cb1e2e79db9f010896d70656981f409%5E%21/	av1_dec_fuzzer
+42515419	exiv2	https://github.com/Exiv2/exiv2/commit/640b0fbf5dd1561ae2d262d654a10f6c8fd2b251	
+42516694	haproxy	https://github.com/haproxy/haproxy/commit/94ab139266a2d2d39f7254644f69fb699559e8e2	
+42516841	msquic	https://github.com/microsoft/msquic/commit/2dfbdcbceb6c17abb6a0b5ac5ba86e955db6f2f8	fuzz
+42516976	openbabel	https://github.com/openbabel/openbabel/commit/b3edf3ad6ee5069fd6b4234e3748308b557c937b	
+42517155	net-snmp	https://github.com/net-snmp/net-snmp/commit/6cac0c842537b9b6aaa104d909a06b85192793a6	
+42517782	mongoose	https://github.com/cesanta/mongoose/commit/abfac8aa4051ad6b74a059e717feb33c73218222	fuzz
+42517790	oniguruma	https://github.com/kkos/oniguruma/commit/34eac8830181bc348dab845932ae3368d1bcf3ff	fuzzer
+42517796	oniguruma	https://github.com/kkos/oniguruma/commit/34eac8830181bc348dab845932ae3368d1bcf3ff	fuzzer
+42518489	krb5	https://github.com/krb5/krb5/commit/c5507dff5f5b2936937442b43f6c021b4f8a493d	
+42519046	pjsip	https://github.com/pjsip/pjproject/commit/d8440f4d711a654b511f50f79c0445b26f9dd1e1	
+42519170	vlc	https://github.com/videolan/vlc/commit/5f57257eeddcdd773540636a6fddbf13f6b2edba	
+42519362	pjsip	https://github.com/pjsip/pjproject/commit/bc4812d31a67d5e2f973fbfaf950d6118226cf36	fuzz-stun
+42519827	zeek	https://github.com/zeek/zeek/commit/44c19086e8dbde76ab25bf1ca94f910c5d6f5a3c	
+42520210	hdf5	https://github.com/HDFGroup/hdf5/commit/10d4a6d0941240702b5e8d77d57184a88bb69e6c	h5_read_fuzzer
+42520955	mosquitto	https://github.com/eclipse/mosquitto/commit/1df253e4e3c48079a196788dbacc9c1364c92162	broker_fuzz_test_config
+42521023	mosquitto	https://github.com/eclipse/mosquitto/commit/23983afe82e61d7aa1b4cdfd192a88b5317e20bb	
+42521038	samba	https://gitlab.com/samba-team/samba/-/commit/795bab5629195395d512bb9a830542de6067195b	
+42521091	mosquitto	https://github.com/eclipse/mosquitto/commit/44415cb97421257e82a40b491598438d0bedef26	
+42521166	hdf5	https://github.com/HDFGroup/hdf5/commit/9e765b9c43c89ad88971e8f0ecae7d610f2cd463	
+42521581	libdwarf	https://github.com/davea42/libdwarf-code/commit/680899627db6f05b8cf8d86272255563b6d81ebd	
+42521870	croaring	https://github.com/RoaringBitmap/CRoaring/commit/2c6708ec84cb8d574c58463c0937e0a922e31f26	croaring_fuzzer_cc
+42522195	mosquitto	https://github.com/eclipse/mosquitto/commit/3fd5ba5f186c6225e0c1dc9dd100d125d15ceda7	broker_fuzz_test_config
+42522326	p11-kit	https://github.com/p11-glue/p11-kit/commit/54bfa28536d5c05deec675cc0a85a6e1fd4a51bf	rpc_fuzzer
+42522585	flac	https://github.com/xiph/flac/commit/147cfc8df424b3b4fe6cc15a37d8ab9f3320dcd6	
+42522874	cyclonedds	https://github.com/eclipse-cyclonedds/cyclonedds/commit/708b9211ca8aeb3312b358df81d259c3d3c9fc70	fuzz_type_object
+42523621	faad2	https://github.com/knik0/faad2/commit/5cee79dded54abbe3a5fbf5f87ca1f3951bd0347	fuzz_decode
+42524112	bloaty	https://github.com/google/bloaty/commit/18384d6c6cbb666d08d08c0dabc4a0d1b7623f6f	fuzz_target
+42524476	liblouis	https://github.com/liblouis/liblouis/commit/1c5432a12e541f597bdc43b7c67ee828df3c49e1	
+42524653	ntopng	https://github.com/ntop/ntopng/commit/18315b80ba40e56fc2981c848d86e604d223bde6	fuzz_dissect_packet
+42525129	PcapPlusPlus	https://github.com/seladb/PcapPlusPlus/commit/6986e81f6fa441a56c4effe2bf2f177ca892255e	FuzzTarget
+42525139	PcapPlusPlus	https://github.com/seladb/PcapPlusPlus/commit/6986e81f6fa441a56c4effe2bf2f177ca892255e	FuzzTarget
+42525170	FreeRDP	https://github.com/FreeRDP/FreeRDP/commit/89bbed83db22b8d63b3e6354963d8d595199304e	TestFuzzCommonAssistanceParseFileBuffer
+42525938	libjpeg-turbo.2.0.x	https://github.com/libjpeg-turbo/libjpeg-turbo/commit/2a00fecd38857cad686cf150dfe499ee15d6e220	transform_fuzzer_2_1_x
+42526375	libjpeg-turbo.main	https://github.com/libjpeg-turbo/libjpeg-turbo/commit/ebca79d508d424687707462675a4a5f09ab4429c	transform_fuzzer_2_0_x
+42526950	oss-fuzz-example	https://github.com/AdaLogics/oss-fuzz-example/commit/61e234fde0dbc8fc03b3586ffe085654723acd33	
+42527319	gpsd	https://gitlab.com/gpsd/gpsd/-/commit/964806dd6dac70232ef1e39f31034b12e4517013	FuzzPacket
+42527409	libxaac	https://github.com/ittiam-systems/libxaac/commit/f39922ae991f3fdd66da1e02d2fdebe6619ae28e	xaac_enc_fuzzer
+42527540	libxaac	https://github.com/ittiam-systems/libxaac/commit/3479c64b9044c4dfdcb914ad1296216b235696ec	
+42530125	qemu	https://git.qemu.org/git/qemu.git5fee33d97a7f2e95716417bd164f2f5264acd976	qemu-fuzz-i386-target-generic-fuzz-e1000
+42530401	samba	https://gitlab.com/samba-team/samba/-/commit/f5c76c3c814dac2b0c09026520f75c0b0e22b6b4	
+42530604	jq	https://github.com/jqlang/jq/commit/71c2ab509a8628dbbad4bc7b3f98a64aa90d3297	jq_fuzz_parse_extended
+42531223	jq	https://github.com/jqlang/jq/commit/b86ff49f46a4a37e5a8e75a140cb5fd6e1331384	jq_fuzz_fixed
+42531297	jq	https://github.com/jqlang/jq/commit/dc849e9bb74a7a164a3ea52f661cc712b1ffbd43	jq_fuzz_execute
+42531514	quickjs	https://github.com/bellard/quickjs/commit/df3781d08265c1a295aef9136c249b408d3a7c95	fuzz_eval
+42531645	upx	https://github.com/upx/upx/commit/3dca1175e5899b54ac97e2ffab38dc5191cc4be4	
+42531653	upx	https://github.com/upx/upx/commit/6dde9f7dc03f94648ce65e203eb1ca382a63016a	test_packed_file_fuzzer
+42532046	quickjs	https://github.com/bellard/quickjs/commit/3b45d155c77bbdfe9177b1e03db830d2aff0b2a8	fuzz_eval
+42533725	p11-kit	https://github.com/p11-glue/p11-kit/commit/f53bdc2c941aae47d592b0376de9a4bc442ec3d2	rpc_fuzzer
+42533949	libspdm	https://github.com/DMTF/libspdm/commit/907da5f6ee1eee9efb91aa1722d8284bc5a92272	test_spdm_responder_chunk_send_ack
+42534222	hdf5	https://github.com/HDFGroup/hdf5/commit/7cc8b5e1010a09c892bc97ac32d9515c3777ce07	h5_extended_fuzzer
+42534794	fwupd	https://github.com/fwupd/fwupd/commit/2157ad2df4a3d92f7319de50b2d0d7bce1255fc0	uswid_fuzzer
+42534812	mosquitto	https://github.com/eclipse/mosquitto/commit/2754b6667d64069bcc3f5e24d43acc83a3a9f27a	broker_fuzz_test_config
+42537903	inchi	https://github.com/IUPAC-InChI/InChI/commit/700998b497c89086125b0cd37d6092b8f77aeddb	
+42481321	arrow	https://github.com/apache/arrow/commit/a6307cc8a0127a4852b7d3d2c20940a094eed0d6	arrow-ipc-stream-fuzz
+42489732	imagemagick	https://github.com/imagemagick/imagemagick/commit/29980610486001ca5404ccb3b3d8e2e124a8ca37	encoder_tiff64_fuzzer
+42475535	karchive	https://invent.kde.org/frameworks/karchive/-/commit/1cd53a27068a46e21b1a47cbf8fb75022d434111	karchive_fuzzer
+42479069	open62541	https://github.com/open62541/open62541/commit/22fadf7edf95caecb84fa1a9b36deac8314fe801	fuzz_mdns_message
+42479223	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/27cee81d06fcff87d9c026a571db58c29c489dfa	fuzz_disassemble
+42479919	yara	https://github.com/VirusTotal/yara/commit/b28de684d9263ce61dcb2516e9ddbd9c7a59c39c	rules_fuzzer
+42481124	unicorn	https://github.com/unicorn-engine/unicorn/commit/ec2e4544819b2ef0ecd297ba331d4f2172b77245	fuzz_emu_arm_thumb
+42521653	cyclonedds	https://github.com/eclipse-cyclonedds/cyclonedds/commit/090b62ee46e8af9c539b2881aa36787e1de08079	fuzz_type_object
+377530685	krb5	https://github.com/krb5/krb5/commit/ead2a8b253c7db8d17a0765044947c5fbd564bc4	fuzz_kdc
+410939009	quickjs	https://github.com/bellard/quickjs/commit/638ec8ca5e1d4aed002a9fb3ef3358e2a6bc42ab	fuzz_compile
+42470146	boringssl	https://boringssl.googlesource.com/boringssl/+/371305f58ac47a98d32f30a9edc6fafa72e842be%5E%21/	ssl_ctx_api
+42470157	libxml2	https://gitlab.gnome.org/GNOME/libxml2/-/commit/8c9daf790abfc06e8ca3a44652542c577bb67d49	libxml2_xml_read_memory_fuzzer
+42470158	libxml2	https://gitlab.gnome.org/GNOME/libxml2/-/commit/074180119fc90d5fd04ef9e8a5ee1910d6f9ad8e	libxml2_xml_read_memory_fuzzer
+42470159	boringssl	https://boringssl.googlesource.com/boringssl/+/371305f58ac47a98d32f30a9edc6fafa72e842be%5E%21/	read_pem
+42470166	graphicsmagick	https://foss.heptapod.net/graphicsmagick/graphicsmagick84d561c2fad5a9643eebecbeaec95a4656d68ade	coder_JNX_fuzzer
+42470541	libxml2	https://gitlab.gnome.org/GNOME/libxml2/-/commit/074180119fc90d5fd04ef9e8a5ee1910d6f9ad8e	libxml2_xml_read_memory_fuzzer
+42470888	graphicsmagick	https://foss.heptapod.net/graphicsmagick/graphicsmagick827ab542df6ef5fad54f28933acf06dc546d2e94	coder_MVG_fuzzer
+42472219	graphicsmagick	https://foss.heptapod.net/graphicsmagick/graphicsmagick5e16e05e1d9dbc60921bd7660d1c5dfc5dfb2f72	coder_MIFF_fuzzer
+42472426	graphicsmagick	https://foss.heptapod.net/graphicsmagick/graphicsmagick3e639c39c620d21e730d9d5121f12bdfb43e37c6	coder_PTIF_fuzzer
+42473594	mupdf	https://github.com/ArtifexSoftware/mupdf/commit/3354edcdd48e0c0c9d4639a6f9513d3e3d44eaa1	pdf_fuzzer
+42473836	capstonenext	https://github.com/aquynh/capstone/commit/ced24fc27d1a818c70cec24d4b3b85b62ed3248c	fuzz_disasmnext
+42474170	capstonenext	https://github.com/aquynh/capstone/commit/ed16aa859f5e03289fed8e259373a172755532ea	fuzz_disasmnext
+42474787	kimageformats	https://invent.kde.org/frameworks/kimageformats/-/commit/0db5c89c5fe839f18b50e5501108f5c70993e7d2	kimgio_ora_fuzzer
+42474924	kimageformats	https://invent.kde.org/frameworks/kimageformats/-/commit/0db5c89c5fe839f18b50e5501108f5c70993e7d2	kimgio_rgb_fuzzer
+42475118	open62541	https://github.com/open62541/open62541/commit/cc7d2558ff2f63859ee1301b5d07b8b110f6cd6e	fuzz_json_decode
+42475142	capstonenext	https://github.com/aquynh/capstone/commit/e9c0772028e689a169047932efc9e08bc96e323a	fuzz_disasmnext
+42475399	karchive	https://invent.kde.org/frameworks/karchive/-/commit/386a1ac6eecf01231b7839deba7e24dd50f5d718	karchive_fuzzer
+42475442	capstonenext	https://github.com/aquynh/capstone/commit/c66bb3396701d1cf4cef44ab02c225d44a8d7f95	fuzz_disasmnext
+42477426	curl	https://github.com/curl/curl/commit/84ced9389e1a7f576812e0675b37056331c4dbcd	curl_fuzzer_pop3
+42477866	mupdf	https://github.com/ArtifexSoftware/mupdf/commit/7d6039ff1b57a07efe0beb0f58b9c947fac3c3aa	pdf_fuzzer
+42478436	poppler	https://gitlab.freedesktop.org/poppler/poppler.git0e8ed9a34e04cc4e56b31f4057c267630c4a7656	pdf_fuzzer
+42478455	curl	https://github.com/curl/curl/commit/62ffab9dcbff5a3cc6254962e32acbd6f48bb385	curl_fuzzer_http
+42478639	usrsctp	https://github.com/weinrank/usrsctp/commit/118e1e8327c5b9b741302e64c9f00e56701174c0	fuzzer_connect
+42479686	qpdf	https://github.com/qpdf/qpdf/commit/232f5fc9f3bed8e1b02bca5d10b2eca444e30f95	dct_fuzzer
+42481162	wavpack	https://github.com/dbry/WavPack/commit/c4e193f3a360817eb097fb54f2f9f84d5dda7112	fuzzer
+42481220	open62541	https://github.com/open62541/open62541/commit/f642222c77731dfe624e919c83b84c282cb68c0b	fuzz_json_decode
+42481642	jbig2dec	git://git.ghostscript.com/jbig2dec.git743d799bfd9014f9ef638634656fea21390d1444	jbig2_fuzzer
+42482537	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/fe90ae8a9f54e4fe8b9089fed48b0e1818414f57	fuzz_disassemble
+42482540	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/340f3ac8082771ecc473ab938fc3d7cbf607ddaa	fuzz_disassemble
+42482563	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/d1023b5d1e4483e5fa3bdab97bc041e1b1c05c5d	fuzz_disassemble
+42482566	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/4c4addbe57711f1cdbb72305b8cbd03a68ae2e34	fuzz_disassemble
+42482567	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/03704c7704870a0e6cbb0eae99488d544c4adb30	fuzz_disassemble
+42482568	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/832a580781060f54731fcf654d76ac1332037a47	fuzz_disassemble
+42482604	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/a18cd0cab43f45b05e9f8bcbf8fed1d67834442d	fuzz_disassemble
+42482918	leptonica	https://github.com/DanBloomberg/leptonica/commit/948e52d7004f2fe536adf5322ed64d54686f663a	pix_rotate_shear_fuzzer
+42484623	libraw	https://github.com/libraw/libraw/commit/363e91ea656f4ce46584b4b0af6285030f236b7e	libraw_fuzzer
+42484646	libhevc	https://android.googlesource.com/platform/external/libhevc/+/e979e4f69a45519b574186b56c883f5f1a413ba8%5E%21/	hevc_dec_fuzzer
+42486241	arduinojson	https://github.com/bblanchon/ArduinoJson/commit/96b65713528476eed35dbab690be837967cedb93	json_fuzzer
+42486708	open62541	https://github.com/open62541/open62541/commit/e1f8fd3b18dd237c1660df79eae411c250348250	fuzz_binary_decode
+42486741	rdkit	https://github.com/rdkit/rdkit/commit/193f27730c3b3bb5068e56858ea90a3ddcc92a8e	mol_data_stream_to_mol_fuzzer
+42488211	c-blosc2	https://github.com/Blosc/c-blosc2/commit/f00715216733649e4ba1bcf29bc6f90f974558a2	decompress_fuzzer
+42492740	relic	https://github.com/relic-toolkit/relic/commit/0886abbb8596c875ccf25981e4cde3a4dd902365	cryptofuzz-relic
+42494517	c-blosc2	https://github.com/Blosc/c-blosc2/commit/cf02dfc992ae5544c92f69befc7093aacf168e77	decompress_frame_fuzzer
+42494782	expat	https://github.com/libexpat/libexpat/commit/56b64ca0406d31f0a8cd93e155c38a3b30b002f8	parse_UTF_16_fuzzer
+42498162	wolfssl	https://github.com/wolfssl/wolfssl/commit/ffb9a8b440fe596b740fc38fb74c9e12498b69d8	cryptofuzz-sp-math-all
+42498268	libjxl	https://github.com/libjxl/libjxl/commit/6e0845247b059bd9efbdc6aba6f2e0f31fcff94b	djxl_fuzzer
+42501992	boringssl	https://boringssl.googlesource.com/boringssl/+/4937f05ccd0b97ff5aeaa1d038cf7f6bc8f7dd36%5E%21/	ssl_ctx_api
+42504520	njs	http://hg.nginx.org/njs7f72930cf1ac021a40c5ce2ceedc23463c48fd5e	njs_process_script_fuzzer
+42539821	tor	https://git.torproject.org/tor.gitc000763f1eadb01bdb1fc159e698ebcff58b3b8b	oss-fuzz-extrainfo
+42471631	aom	https://aomedia.googlesource.com/aom/+/d3e632565ea573f55dfc4c07b557a87ba91b11cb%5E%21/	av1_dec_fuzzer
+42480763	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/100b122fc125bdf1fe768a3331a0cd413c3d1261	fuzz_disassemble
+42480994	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/030a2e78acf66c5c12e073ec3887a167da7a7195	fuzz_disassemble
+42475961	ffmpeg	https://git.ffmpeg.org/gitweb/ffmpeg.git/commitdiff/9351a156de724edb69ba6e1f05884fe806a13a21	ffmpeg_AV_CODEC_ID_AC3_fuzzer
+42509538	openh264	https://github.com/cisco/openh264/commit/062f9cbc065cba3d0688853e8680856f9bd26bf9	decoder_fuzzer
+42515541	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/f15ba945a49b75c23f8133f3be170a681bb050de	fuzz_disas_ext-bfd_arch_arm
+42530523	libavc	https://github.com/ittiam-systems/libavc/commit/e49a9150a3b1cfc3fb9097ca02dd042e35226129	svc_dec_fuzzer
+42479021	imagemagick	https://github.com/imagemagick/imagemagick/commit/c96c5eac9a0467ffdb1cb67517702bf80d5a5277	encoder_viff_fuzzer
+42490119	graphicsmagick	https://foss.heptapod.net/graphicsmagick/graphicsmagick4fc18176a211fa741f9016a87e3be0be7c5bc74b	coder_JPG_fuzzer
+42498403	harfbuzz	https://github.com/harfbuzz/harfbuzz/commit/5f50f8837f918ca1d176355d1538e0e6c9703f41	hb-fuzzer
+42502936	ndpi	https://github.com/ntop/nDPI/commit/6e649e0cb6d45d72600198c25f4069f4aeb1e121	fuzz_process_packet
+42507057	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/ce20459e162175710d8ef56118fc34edabfdce5e	fuzz_disas_ext-bfd_arch_i386
+42510129	unrar	https://github.com/aawc/unrar/commit/9866c9649507f177233ca96feefac8b12e36a91f	unrar_fuzzer
+42510657	libraw	https://github.com/libraw/libraw/commit/ce2250c6645897d1ff6a44c8167dde76730a0372	libraw_cr2_fuzzer
+42510687	libxml2	https://gitlab.gnome.org/GNOME/libxml2/-/commit/670701075b969962db1b869507318e81e96910d1	xml
+42510751	librawspeed	https://github.com/darktable-org/rawspeed/commit/a1a415052fc3632b50b576891cab04b66451255b	FiffParserFuzzer-GetDecoder-Decode
+42520815	open62541	https://github.com/open62541/open62541/commit/3d4b8666b02ecea0045c2ba8ae4c46a3f766c765	fuzz_binary_message
+42521281	mupdf	https://github.com/ArtifexSoftware/mupdf/commit/862245679f67ff35d9868bad5b7ede1c7b1c0873	pdf_fuzzer
+42522715	wolfssl	https://github.com/wolfssl/wolfssl/commit/ec9beaab4165d860ebcd7703493cfb3585f5a8ab	fuzzer-wolfssl-server-randomize
+42528694	libxml2	https://gitlab.gnome.org/GNOME/libxml2/-/commit/fc49679316e067d667b71b8e0b987f0b704abce6	valid
+42537377	librawspeed	https://github.com/darktable-org/rawspeed/commit/fcd827cff1e0026e5bf8d7a34ee15f115ec8b01e	Cr2DecompressorFuzzer
+42537634	ffmpeg	https://git.ffmpeg.org/gitweb/ffmpeg.git/commitdiff/c390234da2e3c7a8884f5592f0b9b4928c482b3e	ffmpeg_dem_WTV_fuzzer
+42538533	librawspeed	https://github.com/darktable-org/rawspeed/commit/bb585d942661d6e7173eb493c172a463e5378922	Cr2DecompressorFuzzer
+42538651	librawspeed	https://github.com/darktable-org/rawspeed/commit/ab959c2235ab69359cdc75372c5cdf7bcc324726	TiffDecoderFuzzer-ArwDecoder
+42539513	graphicsmagick	https://foss.heptapod.net/graphicsmagick/graphicsmagick2422cb07d5aec72eb96f4b85dcb47975e9e0f499	coder_DPX_fuzzer
+42540117	poppler	https://gitlab.freedesktop.org/poppler/poppler.git4ea7ac960d9ecb6a407d0e660312f5701d3dcd49	pdf_fuzzer
+42540199	graphicsmagick	https://foss.heptapod.net/graphicsmagick/graphicsmagick98bc09f42fcba74a1165ad0f986fee2562a44260	coder_DCM_fuzzer
+42540339	graphicsmagick	https://foss.heptapod.net/graphicsmagick/graphicsmagick5e54a4e06ab4a9ee86297e5e9b386f7e8a975810	coder_TIFF_fuzzer
+42540396	graphicsmagick	https://foss.heptapod.net/graphicsmagick/graphicsmagick41f29273fcff496b22af9f21a9fbbe42a072b471	coder_PTIF_fuzzer
+42540576	capstonenext	https://github.com/aquynh/capstone/commit/36d45855664827a2e601330945cc77a8d8ee8f0b	fuzz_disasmmaster
+42540982	unrar	https://github.com/aawc/unrar/commit/15f897496ab552b1f042c56344c35b49a57363b8	unrar_fuzzer
+42481979	ndpi	https://github.com/ntop/nDPI/commit/3c05d4551dfb1181770416c4301a4f92415e41af	fuzz_process_packet
+42496486	serenity	https://github.com/SerenityOS/serenity/commit/f1d49d391ee3b466b758e8d6d2301eccd1eb382c	FuzzShell
+42499769	serenity	https://github.com/SerenityOS/serenity/commit/0016f63547f70f969eeb6030d8d7433b05cae934	FuzzWasmParser
+42499915	serenity	https://github.com/SerenityOS/serenity/commit/0016f63547f70f969eeb6030d8d7433b05cae934	FuzzBMPLoader
+42501254	serenity	https://github.com/SerenityOS/serenity/commit/896d1e4f42d30f90ce1c983c0b1c5e7bf9578fd1	FuzzSQLParser
+42503652	serenity	https://github.com/SerenityOS/serenity/commit/c388a879d73633b6ebe8353fd2a0407b908fe26f	FuzzPEM
+42508700	openh264	https://github.com/cisco/openh264/commit/27d06a2032d1792ad486bfbf4acd0183b964cdf4	decoder_fuzzer
+42512197	opensc	https://github.com/OpenSC/OpenSC/commit/367c3ad2ef2c10cb29602f72163e7fb23c3f5827	fuzz_pkcs15init
+42517443	mruby	https://github.com/mruby/mruby/commit/8a67a26104a70b666c5e209a5fb3b0733cfbb3d8	mruby_fuzzer
+42539882	openthread	https://github.com/openthread/openthread/commit/5659668aca694a3fd252f0b5adc6f0c95d6673d4	ip6-send-fuzzer
+42540191	graphicsmagick	https://foss.heptapod.net/graphicsmagick/graphicsmagickcedcb6e1f19418cbb1e3b2829d85f0eba6d90178	coder_MNG_fuzzer
+42540691	gdal	https://github.com/OSGeo/gdal/commit/7f5252fc1806867fbedee461551c9521b5078c24	gdal_fuzzer
+42524812	mupdf	https://github.com/ArtifexSoftware/mupdf/commit/862245679f67ff35d9868bad5b7ede1c7b1c0873	pdf_fuzzer
+42524846	mupdf	https://github.com/ArtifexSoftware/mupdf/commit/3f3de914a38ef440cf99c4b0c6f0f043c5fdffbe	pdf_fuzzer
+42529779	mupdf	https://github.com/ArtifexSoftware/mupdf/commit/6d167be4bd4d425e3966eef17e34c1589f21af81	pdf_fuzzer
+42530277	skia	https://skia.googlesource.com/skia.git/+/cbf66a22130a1fd13285bb65d3a0d7ee6b4e8ab3%5E%21/	image_decode
+42530565	mupdf	https://github.com/ArtifexSoftware/mupdf/commit/ca4aefc96a54df3cff761549ca730889967791f2	pdf_fuzzer
+42534859	mupdf	git://git.ghostscript.com/thirdparty-libjpeg.git7fe42a89507fac623fadf0c68fd1b10ebef66a23	pdf_fuzzer
+42477083	ffmpeg	https://git.ffmpeg.org/gitweb/ffmpeg.git/commitdiff/0e87c07d87b474568e82364ae0d4a3928801e2b2	ffmpeg_AV_CODEC_ID_H264_fuzzer
+42479262	ffmpeg	https://git.ffmpeg.org/gitweb/ffmpeg.git/commitdiff/de5102fd92de8d353fdf060375ed3ce859c83977	ffmpeg_AV_CODEC_ID_ATRAC3P_fuzzer
+42518789	serenity	https://github.com/SerenityOS/serenity/commit/0016f63547f70f969eeb6030d8d7433b05cae934	FuzzFlacLoader
+42477797	libhevc	https://android.googlesource.com/platform/external/libhevc/+/1e2d083b14478f051b9ecb436a818fad7e0d86ab%5E%21/	hevc_dec_fuzzer
+42517925	libraw	https://github.com/libraw/libraw/commit/b7771a8e4c01851f7674146e47f7a460633f5e99	
+42479160	open62541	https://github.com/open62541/open62541/commit/cc7d2558ff2f63859ee1301b5d07b8b110f6cd6e	fuzz_json_decode_encode
+42537851	haproxy	https://github.com/haproxy/haproxy/commit/0982bfd9997d73bae1257da56413898f5f8d97fe	fuzz_cfg_parser
+42478424	graphicsmagick	https://foss.heptapod.net/graphicsmagick/graphicsmagick53ff1a445fb6d04ef4a337bb7ab0a09c53a24216	coder_SFW_fuzzer
+42522777	libdwarf	https://github.com/davea42/libdwarf-code/commit/36e4063ade31c9ea6ea5df973d2045b36877885b	fuzz_srcfiles
+42479369	lwan	https://github.com/lpereira/lwan/commit/ab882fe013ec880425bd918e0bcbf9e798361585	
+415850462	haproxy	https://github.com/haproxy/haproxy/commit/10e6d0bd5702586a11daf8bd320713e0b501e37d	
+42507890	ghostpdl	https://cgit.ghostscript.com/ghostpdl.git2c3bee693aca9204b5c138bd3e1fbeff83123c5d	gstoraster_fuzzer
+42506689	sleuthkit	https://github.com/sleuthkit/sleuthkit/commit/044c493f027b83df9f6ce5d4fc643b8862cce1f8	sleuthkit_fls_hfs_fuzzer
+42526333	libraw	https://github.com/libraw/libraw/commit/3baa51068767ae2070c4661e00a3b77d5c3139b7	libraw_fuzzer
+42487640	oniguruma	https://github.com/kkos/oniguruma/commit/a4aaa67878509ea8296ef349bcfe98da48bc5457	
+42477802	libhevc	https://android.googlesource.com/platform/external/libhevc/+/1e2d083b14478f051b9ecb436a818fad7e0d86ab%5E%21/	hevc_dec_fuzzer
+42539878	libreoffice	https://git.libreoffice.org/coree89350cc1e0b8696ef51251acfb7543fd196ff3a	
+42537249	kimageformats	https://invent.kde.org/frameworks/kimageformats/-/commit/acd6b3970c96ed7f4e0ed6ab2f0abb63bef304a8	
+42538426	capstonenext	https://github.com/capstone-engine/capstone/commit/21f7bc85f9026ece8adc34d02b6e23863f6185ae	fuzz_disasmnext
+42482063	pcre2	https://github.com/PCRE2Project/pcre2/commit/68f9c495178a04e055cf1b25e63edd0e59461183	^[[A^[[A^[[A^[[A^[[A^[[A^[[A^[[A^[[A^[[A^[[B^[[B^[[B^[[B^[[Bpcre2_fuzzer
+407590995	icu	https://github.com/unicode-org/icu/commit/197be68a147938c38d227bd832fd3e23bec77283	
+42504581	arrow	https://github.com/apache/arrow/commit/a36dd8cd208582316322b0dd6e7569785c8f2780	arrow-ipc-stream-fuzz
+42500614	libexif	https://github.com/libexif/libexif/commit/a4647a5463102c4b0c5a02461edd4cc085dfc1b6	exif_from_data_fuzzer
+42535104	icu	https://github.com/unicode-org/icu/commit/faac745421f0ef85baf6001216b80aaaddb0e821	
+42523856	json	https://github.com/nlohmann/json/commit/b9f314945140afb427f424b8f2de568b92bc03c3	parse_afl_fuzzer
+42521609	libdwarf	https://github.com/davea42/libdwarf-code/commit/bb99fe7ddb2bc6601bcb0ee30ced6a8cc8cb0564	
+42501937	libarchive	https://github.com/libarchive/libarchive/commit/9ad5f077491b9536f01dadca1724385c39cd7613	libarchive_fuzzer
+414675374	wamr	https://github.com/bytecodealliance/wasm-micro-runtime/commit/26aa4830e9db000c8117321f3c40e25d7474d518	wamr_fuzz_llvm_jit
+42527452	ntopng	https://github.com/ntop/ntopng/commit/d31de871d3bc8e9a24bace37cf9b480867705ab3	
+42501431	kamailio	https://github.com/kamailio/kamailio/commit/1d3fde1205440296c1d6a54feee5a9d637055bee	fuzz_parse_msg
+42509966	exiv2	https://github.com/Exiv2/exiv2/commit/d16ca65b01188d28afbe5a52b1495ac0270dd95a	fuzz-read-print-write
+42475116	open62541	https://github.com/open62541/open62541/commit/e1cdb1dd75ea92adcc949c5d3dc4fc4ebdf74b92	fuzz_json_decode_encode
+42515434	libjxl	https://github.com/libjxl/libjxl/commit/60a019fb5bd4a119c90167662449a3224b91f629	
+42478937	libhevc	https://android.googlesource.com/platform/external/libhevc/+/1e2d083b14478f051b9ecb436a818fad7e0d86ab%5E%21/	hevc_dec_fuzzer
+42489582	openvswitch	https://github.com/openvswitch/ovs/commit/55f2b065acd477a6810d5279fcace8b42bd594f5	odp_target
+42541581	file	https://github.com/file/file/commit/473e039b48fd72660dd00f4b52a2880cc0dd5632	magic_fuzzer
+42479268	libgit2	https://github.com/libgit2/libgit2/commit/6c6c15e935091a33f83d8de4ee5b0640339b2b89	
+42538160	libultrahdr	https://github.com/google/libultrahdr/commit/89480db742e0af741901b1f8740566b89b798c3b	
+42500626	libexif	https://github.com/libexif/libexif/commit/a4647a5463102c4b0c5a02461edd4cc085dfc1b6	exif_from_data_fuzzer
+42487079	rnp	https://github.com/rnpgp/rnp/commit/1c43db6db6ec3c8f84d6d751f904ab8558561430	fuzz_keyring_kbx
+42513013	file	https://github.com/file/file/commit/16756ff9286df9a43b4b6e21824975a1c6809835	magic_fuzzer
+42491901	mupdf	https://github.com/ArtifexSoftware/mupdf/commit/e27ceb2b0e64b9a56ba79d844ea96553d87dc113	
+42514618	open62541	https://github.com/open62541/open62541/commit/68bdf5e9a9bfc1c50b0bae131ef34b7c12f2b9ba	fuzz_binary_message
+42540604	freetype2	https://github.com/freetype/freetype2/commit/a6b77ba2b39e379cd9295a9376fedf574a6ba15f	ftfuzzer
+42533540	aom	https://aomedia.googlesource.com/aom/+/08efc1491525624dc5f5ebf0e450227524a7db4f%5E%21/	av1_dec_fuzzer
+42519760	imagemagick	https://github.com/imagemagick/imagemagick/commit/3c8e8dbc5f8f617fa902cffaa90368beb96fd8a4	encoder_pes_fuzzer
+42538986	imagemagick	https://github.com/imagemagick/imagemagick/commit/4c52a8adc4d9a0f03d501021b3f751f5f02fe62e	
+42513882	wolfssl	https://github.com/wolfssl/wolfssl/commit/c2476e38581804958f31bae786b6039ee5d5a3d0	
+42475544	radare2	https://github.com/radare/radare2/commit/0e7b37601a2011c9b11112566e2d8f1b2611986d	ia_fuzz
+42522074	libdwarf	https://github.com/davea42/libdwarf-code/commit/771cfcca1ef6a4a7eb9595d700fc72020d0ed72e	fuzz_macro_dwarf5
+42482019	ndpi	https://github.com/ntop/nDPI/commit/fe513014a8f5156b243ec2eb5e6862a0506c6632	
+42481865	htslib	https://github.com/samtools/htslib/commit/d6f15361ee63ff13dfb57f3eac119e3d50e65c56	
+42491468	serenity	https://github.com/SerenityOS/serenity/commit/3e723ec1776d3734b30d0b5bf6daad86ba908a0a	FuzzTTF
+42540213	graphicsmagick	https://foss.heptapod.net/graphicsmagick/graphicsmagicka4ee1abf87681a7cf41d14d0b842148695654964	
+42473117	libarchive	https://github.com/libarchive/libarchive/commit/3614747af54e60229a2bf11e8f40e1b975cc9ae6	
+42477279	libvips	https://github.com/libvips/libvips/commit/19a80e4efbcf67ac8703f1c0d25820dd13d6f071	
+42474367	radare2	https://github.com/radare/radare2/commit/d271da09ab6cf4817cfabede153e6bd547118cdd	ia_fuzz
+42517169	assimp	https://github.com/assimp/assimp/commit/96b071bdb1965084c6e78073f9f42a872300f308	assimp_fuzzer
+42528658	mruby	https://github.com/mruby/mruby/commit/097681b4d458899dff945138ea39ae125df3e16a	
+42535839	c-blosc2	https://github.com/Blosc/c-blosc2/commit/cf8d63c23d68754eb50762b45e58ab9a13b8d470	decompress_frame_fuzzer
+42539741	wireshark	https://github.com/wireshark/wireshark/commit/f440561b8c49c7863191c1ff2b36debed4d8d620	fuzzshark_ip_proto-udp
+42472609	wireshark	https://github.com/wireshark/wireshark/commit/6fdf8eb5a92d51617203be1a712c15585b156497	fuzzshark_ip
+42524524	wireshark	https://github.com/wireshark/wireshark/commit/7da66f8676cc663d8898b5ff9cf41cad80df4900	
+42502186	mruby	https://github.com/mruby/mruby/commit/0455313a9bdbe93556a8fd31b7c011dd004a6f2b	mruby_fuzzer
+42494191	libredwg	https://github.com/LibreDWG/libredwg/commit/1f291651e70ebe7a2b808e1f6ae4f15770aeeea8	llvmfuzz
+42526087	libdwarf	https://github.com/davea42/libdwarf-code/commit/c8c5073f35b1efdcc610ecf369c78f87fdd34714	
+42527782	serenity	https://github.com/SerenityOS/serenity/commit/9e3ee0e2b589ec8b28b27a72232a76e5d57e294b	FuzzILBMLoader
+42474963	net-snmp	https://github.com/net-snmp/net-snmp/commit/7de049193ab78d9fcdc3baa2c0673bd1e300ed5b	
+42516625	hunspell	https://github.com/hunspell/hunspell/commit/7357713ba5d529f3ff70c654b703429fc9cb55a4	affdicfuzzer
+42531989	htslib	https://github.com/samtools/htslib/commit/b08332d60a458f64ad4186dbe137ef528881c683	
+42502807	php-src	https://github.com/php/php-src/commit/85cb417d37323a4eb059225e4f16dcd6d5abc9df	
+42495817	c-blosc2	https://github.com/Blosc/c-blosc2/commit/8a058b7a6be4d7e47a9af5831c454fca8c725dd4	decompress_frame_fuzzer
+42478856	graphicsmagick	https://foss.heptapod.net/graphicsmagick/graphicsmagick5f56eaafe189815bd8abdd42bbf53ad5e3185933	coder_JPG_fuzzer
+42488342	libvips	https://github.com/libvips/libvips/commit/ae82bcc3e8797af4fdca8adf8ef73acac7718f7b	smartcrop_fuzzer
+42490125	php-src	https://github.com/php/php-src/commit/f06afc434aec631f18f8da8ffca9a6f0559e1acf	
+42522273	libxml2	https://gitlab.gnome.org/GNOME/libxml2/-/commit/ca2bfecea9c23f8d2e11741fff7c6a5372c56bb8	html
+42490247	serenity	https://github.com/SerenityOS/serenity/commit/531c3fe72eb18615dba89bfe673b8a8336abfb89	
+42532364	upx	https://github.com/upx/upx/commit/10807ebdc212c44db366131e71b3e358643eae51	test_packed_file_fuzzer
+42537072	lcms	https://github.com/mm2/Little-CMS/commit/1c9021be51ad9fbeabdd4f55d9453c394d8d52ae	cms_virtual_profile_fuzzer
+42490592	openthread	https://github.com/openthread/openthread/commit/e2d027c8a53b42bf5451e8c6fbf1abacd7e73c4a	
+42490739	openthread	https://github.com/openthread/openthread/commit/b3fc7bc453034aa61cd27d5208f08ead9c7789e0	cli-uart-received-fuzzer
+42515678	hunspell	https://github.com/hunspell/hunspell/commit/4631c530b0afbd57ef34ffa6260899ffa6d91eb4	
