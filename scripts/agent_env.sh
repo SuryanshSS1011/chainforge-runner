@@ -35,9 +35,13 @@ docker exec "$NAME" bash -c '
   find /src -maxdepth 4 -name .git 2>/dev/null | awk -F/ "{print NF\" \"\$0}" | sort -rn | cut -d" " -f2- |
   while read -r d; do
     r=$(dirname "$d")
+    # Builds that read their version from git (x265 via `git describe`) need the newest tag the
+    # vulnerable revision already had. It names the past, so it is kept on the new commit.
+    t=$(git -C "$r" describe --tags --abbrev=0 2>/dev/null)
     rm -rf "$d"
     git -C "$r" init -q && git -C "$r" add -A >/dev/null 2>&1 \
-      && git -C "$r" commit -q -m "vulnerable revision" >/dev/null 2>&1
+      && git -C "$r" commit -q -m "vulnerable revision" >/dev/null 2>&1 \
+      && { [ -z "$t" ] || git -C "$r" tag "$t" >/dev/null 2>&1; }
   done'
 
 if [ "$CHECK" = 0 ]; then echo "$NAME"; exit 0; fi
@@ -54,9 +58,11 @@ TAIL=""
 docker rm -f "$NAME" >/dev/null 2>&1
 # If the offline build failed, tell the rewrite from the network apart: rebuild the unmodified
 # image with the network on.
-ONLINE=null
+ONLINE=null; OFFLINE=null
 if [ "$BUILD" != 0 ]; then
+  # Which change broke it: the network (unmodified image, offline) or the rewrite (online)?
+  docker run --rm --network none "$IMG" bash -c 'arvo compile >/dev/null 2>&1'; OFFLINE=$?
   docker run --rm "$IMG" bash -c 'arvo compile >/dev/null 2>&1'; ONLINE=$?
 fi
-printf '{"arvo_id":"%s","fix_reachable_in_repos":%s,"network":"%s","build_rc":%s,"plain_online_build_rc":%s,"build_tail":%s}\n' \
-  "$ID" "${LEAK:-null}" "$NET" "$BUILD" "$ONLINE" "${TAIL:-null}"
+printf '{"arvo_id":"%s","fix_reachable_in_repos":%s,"network":"%s","build_rc":%s,"plain_offline_build_rc":%s,"plain_online_build_rc":%s,"build_tail":%s}\n' \
+  "$ID" "${LEAK:-null}" "$NET" "$BUILD" "$OFFLINE" "$ONLINE" "${TAIL:-null}"
