@@ -31,6 +31,7 @@ N=$(python3 -c "import json;print(json.load(open('$OUT/hunks/index.json'))['writ
 # Docker Hub allows ~200 pulls per 6 h; a 400-case batch exceeds it. Wait out the limit.
 for t in 1 2 3 4 5 6; do
   docker pull -q "$IMG" > "$OUT/pull.log" 2>&1 && break
+  docker pull -q "mirror.gcr.io/$IMG" >> "$OUT/pull.log" 2>&1 && { docker tag "mirror.gcr.io/$IMG" "$IMG"; break; }
   if grep -qi "toomanyrequests" "$OUT/pull.log"; then sleep 1800; else sleep 60; fi
 done
 docker image inspect "$IMG" >/dev/null 2>&1 || emit '{"status":"image_pull_failed"}'
@@ -95,6 +96,6 @@ import json
 res = json.loads('''$RESULTS''')
 g = next((r for r in res if r["outcome"] == "clean"), None)
 print(json.dumps({"arvo_id": "$ID", "project": "$PROJECT", "status": "ok", "control": "$CTRL",
-                  "host": "github-actions", "n_hunks": $N, "n_tried": len(res), "results": res,
+                  "host": "github-actions", "fuzz": 0, "n_hunks": $N, "n_tried": len(res), "results": res,
                   "guard_hunk": g, "source_causally_proven": bool(g)}, indent=1))
 PY

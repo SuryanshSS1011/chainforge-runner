@@ -84,7 +84,12 @@ PY
   MNT+=(-v "$OUT/files:/tmp/cf_files:ro")
 fi
 
-for t in 1 2 3; do docker pull -q "$IMG" >"$OUT/pull.log" 2>&1 && break; sleep 60; done
+# Docker Hub, then Google's Hub mirror (same manifest, so the same digest), backing off.
+for w in 60 120 300 600 0; do
+  docker pull -q "$IMG" >"$OUT/pull.log" 2>&1 && break
+  docker pull -q "mirror.gcr.io/$IMG" >>"$OUT/pull.log" 2>&1 && { docker tag "mirror.gcr.io/$IMG" "$IMG"; break; }
+  sleep $w
+done
 docker image inspect "$IMG" >/dev/null 2>&1 || {
   echo '{"outcome":"not_run","why":"image pull failed"}' >"$OUT/result.json"; exit 0; }
 

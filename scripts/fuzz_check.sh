@@ -51,7 +51,12 @@ for line in specs.read_text().splitlines():
         (kd / f"{key}.patch").write_text(text)
 PY
 IMG="n132/arvo:${ID}-vul"
-for w in 60 300 0; do docker pull -q "$IMG" >/dev/null 2>&1 && break; sleep $w; done
+# Docker Hub, then Google's Hub mirror (same manifest), backing off between rounds.
+for w in 60 120 300 600 0; do
+  docker pull -q "$IMG" >/dev/null 2>&1 && break
+  docker pull -q "mirror.gcr.io/$IMG" >/dev/null 2>&1 && { docker tag "mirror.gcr.io/$IMG" "$IMG"; break; }
+  sleep $w
+done
 docker image inspect "$IMG" >/dev/null 2>&1 || emit_all pull_failed
 docker run --rm -v "$W/keys:/keys:ro" "$IMG" bash -c '
   WD=$PWD
