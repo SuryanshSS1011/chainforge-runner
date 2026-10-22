@@ -105,6 +105,26 @@ HOSTCC="${CF_HOSTCC:-}"
 if [[ -z "$HOSTCC" ]] && (( VER < 6 )) && command -v gcc-11 >/dev/null; then HOSTCC=gcc-11; fi
 MK=(make -C "$KSRC" -j"$JOBS" CROSS_COMPILE="$CROSS" KCFLAGS=-g0 HOSTCFLAGS="-g0 -O2"
     ${HOSTCC:+HOSTCC=$HOSTCC} ${HOSTCC:+HOSTCXX=${HOSTCC/gcc/g++}})
+# Kernels before 5.8 predate gcc 10 and the runner's binutils and glibc: objtool, thunks and
+# FORTIFY checks fail there (43 of 56 builds in the first runner batch). Build them inside the
+# compiler syzbot used for that era, gcc 8 for 4.x and gcc 9 for 5.0-5.7 (Docker's gcc images,
+# with their own binutils and host libraries), for both revisions alike. Recorded as the compiler.
+KIMG="${CF_KIMG:-}"
+if [[ -z "$KIMG" && -z "${CF_GCC:-}" ]]; then
+  if (( VER < 5 )); then KIMG=8; elif (( VER == 5 && PL < 8 )); then KIMG=9; fi
+fi
+if [[ -n "$KIMG" ]] && command -v docker >/dev/null; then
+  if ! docker image inspect "cf-kbuild:$KIMG" >/dev/null 2>&1; then
+    printf '%s\n' "FROM gcc:$KIMG" \
+      'RUN (apt-get update -qq || { sed -i "s|deb.debian.org|archive.debian.org|g; s|security.debian.org|archive.debian.org|g; /-updates/d" /etc/apt/sources.list; apt-get -o Acquire::Check-Valid-Until=false update -qq; }) && apt-get install -y -qq flex bison bc libelf-dev libssl-dev cpio kmod >/dev/null' \
+      | docker build -q -t "cf-kbuild:$KIMG" - >"$WORK/kimg.log" 2>&1 || KIMG=""
+  fi
+fi
+if [[ -n "$KIMG" ]]; then
+  GCCV="gcc:$KIMG container"
+  MK=(docker run --rm -u "$(id -u):$(id -g)" -v "$KSRC:$KSRC" -w "$KSRC" "cf-kbuild:$KIMG"
+      make -C "$KSRC" -j"$JOBS" KCFLAGS=-g0 HOSTCFLAGS="-g0 -O2")
+fi
 
 cp "$WORK/kernel.config" "$KSRC/.config"
 cat >> "$KSRC/.config" <<'CFG'
