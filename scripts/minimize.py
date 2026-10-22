@@ -60,9 +60,9 @@ def run(img: str, project: str, patch: str) -> str:
         f.write(patch)
     script = (
         'WD=$PWD; at=""; for D in "/src/' + project + '" "$WD" /src/*/; do for L in 1 0 2; do '
-        '(cd "$D" 2>/dev/null && patch -p$L --forward --batch --dry-run < /tmp/p.patch >/dev/null 2>&1) '
+        '(cd "$D" 2>/dev/null && patch -p$L --fuzz=0 --forward --batch --dry-run < /tmp/p.patch >/dev/null 2>&1) '
         '&& { at=$D; break 2; }; done; done; [ -n "$at" ] || { echo CF_PATCH_FAIL; exit 9; }; '
-        '(cd "$at" && patch -p$L --forward --batch < /tmp/p.patch >/dev/null 2>&1) || { echo CF_PATCH_FAIL; exit 9; }; '
+        '(cd "$at" && patch -p$L --fuzz=0 --forward --batch < /tmp/p.patch >/dev/null 2>&1) || { echo CF_PATCH_FAIL; exit 9; }; '
         'cd "$WD"; sed -i -E "s/(^|[;&|[:space:]])mkdir ([^-])/\\1mkdir -p \\2/" "$SRC/build.sh" 2>/dev/null; '
         'arvo compile >/tmp/b.log 2>&1 || { echo CF_BUILD_FAIL; exit 8; }; arvo run 2>&1 | head -80'
     )

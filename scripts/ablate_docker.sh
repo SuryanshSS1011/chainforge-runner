@@ -45,12 +45,12 @@ variant(){  # <log> [patch] : fresh container, optional patch, full rebuild, rep
       WD=$PWD; at=""
       for D in "/src/'"$PROJECT"'" "$WD" /src/*/; do
         for L in 1 0 2; do
-          (cd "$D" 2>/dev/null && patch -p$L --forward --batch --dry-run < /tmp/cf_p.patch >/dev/null 2>&1) \
+          (cd "$D" 2>/dev/null && patch -p$L --fuzz=0 --forward --batch --dry-run < /tmp/cf_p.patch >/dev/null 2>&1) \
             && { at=$D; break 2; }
         done
       done
-      [ -n "$at" ] || { echo CF_PATCH_FAIL; cd "$WD"; patch -p1 --forward --batch --dry-run < /tmp/cf_p.patch; exit 9; }
-      (cd "$at" && patch -p$L --forward --batch < /tmp/cf_p.patch > /tmp/p.log 2>&1) || { echo CF_PATCH_FAIL; cat /tmp/p.log; exit 9; }
+      [ -n "$at" ] || { echo CF_PATCH_FAIL; cd "$WD"; patch -p1 --fuzz=0 --forward --batch --dry-run < /tmp/cf_p.patch; exit 9; }
+      (cd "$at" && patch -p$L --fuzz=0 --forward --batch < /tmp/cf_p.patch > /tmp/p.log 2>&1) || { echo CF_PATCH_FAIL; cat /tmp/p.log; exit 9; }
       echo "CF_PATCHED_AT $at -p$L"
       cd "$WD"
     fi
