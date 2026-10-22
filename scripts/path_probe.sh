@@ -26,14 +26,25 @@ timeout 1500 docker run --rm -v "$W:/pp" -e T="$T" -e RF="$RF" -e RL="$RL" -e RF
   fi
   [ -x "$B" ] || { echo no_target > /pp/status; exit 0; }
   ok() { [ -n "$1" ] && [ "$1" != "None" ]; }
-  # BRE: the name at the start or after a non-identifier character (the "::" of a qualified
-  # name), then "(" or the end of the symbol. No colon: rbreak splits FILE:REGEX at the first one.
-  re() { printf "\\(^\\|[^A-Za-z0-9_]\\)%s\\((\\|$\\)" "$1"; }
+  # Three patterns cover a C symbol (foo), a C++ free function (foo(int)) and a member or
+  # namespaced one (ns::C::foo(int)). gdb 7 regexes are basic, and rbreak splits FILE:REGEX at
+  # the first colon, so no pattern contains one.
+  pats() { printf "%s\n" "^$1\$" "^$1(" "[^A-Za-z0-9_]$1("; }
+  # rbreak lines for one function, restricted to its file when that finds a symbol: binaries
+  # without debug info know no files, and an unrestricted name can land in libc.
+  fn() {
+    local pre="" n=0
+    if ok "$2"; then
+      n=$(pats "$1" | while read -r p; do gdb -nx -batch -ex "rbreak $2:$p" "$B" </dev/null 2>/dev/null; done | grep -c "^Breakpoint [0-9]")
+      [ "$n" -gt 0 ] && pre="$2:"
+    fi
+    pats "$1" | while read -r p; do printf "rbreak %s%s\n" "$pre" "$p"; done
+  }
   {
     printf "set pagination off\nset confirm off\nset breakpoint pending on\n"
     ok "$RL" && printf "echo @@line\\\\n\nbreak %s:%s\n" "$RF" "$RL"
-    ok "$RFN" && printf "echo @@func\\\\n\nrbreak %s%s\n" "$( ok "$RF" && echo "$RF:" )" "$(re "$RFN")"
-    ok "$SFN" && printf "echo @@sink\\\\n\nrbreak %s%s\n" "$( ok "$SF" && echo "$SF:" )" "$(re "$SFN")"
+    ok "$RFN" && { printf "echo @@func\\\\n\n"; fn "$RFN" "$RF"; }
+    ok "$SFN" && { printf "echo @@sink\\\\n\n"; fn "$SFN" "$SF"; }
     printf "echo @@end\\\\n\n"
     printf "commands 1-\$bpnum\nsilent\ncontinue\nend\n"
     printf "run\ninfo breakpoints\nquit\n"
@@ -74,7 +85,14 @@ if st == "ran":
         if not live:
             res[k] = "unresolved"
             continue
-        res[k] = sum(int(h.group(1)) for b in live for h in [re.search(r"already hit (\d+) time", b)] if h)
+        # Patterns can match one function twice; count each address once.
+        hits = {}
+        for b in live:
+            a = re.match(r"(\d+)\s+breakpoint\s+keep\s+y\s+(\S+)", b)
+            key = a.group(2) if a and a.group(2).startswith("0x") else (a.group(1) if a else b)
+            h = re.search(r"already hit (\d+) time", b)
+            hits[key] = int(h.group(1)) if h else 0
+        res[k] = sum(hits.values())
         if k == "line":
             # Does the line's enclosing function, as the debug info names it, match the label?
             f = re.search(r"\bin (\S+?)(?:\(.*?\))? at \S+:\d+", live[0])
