@@ -1,0 +1,31 @@
+name: gitdiff
+on:
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: "Case list: <arvo id>\\t<git repo url>\\t<fix sha> per line"
+        required: true
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch each fix and its parent shallowly, blobs on demand, and diff them
+        run: |
+          mkdir -p out
+          while IFS=$'\t' read -r id repo sha; do
+            [ -z "$id" ] && continue
+            d="w/$(echo "$repo" | tr -c 'A-Za-z0-9' _)"
+            [ -d "$d/.git" ] || { git init -q "$d"; git -C "$d" remote add origin "$repo"; }
+            git -C "$d" cat-file -e "$sha^{commit}" 2>/dev/null \
+              || timeout 900 git -C "$d" fetch -q --depth=2 --filter=blob:none origin "$sha" || true
+            git -C "$d" diff "$sha^" "$sha" > "out/$id.diff" 2>/dev/null || rm -f "out/$id.diff"
+            [ -s "out/$id.diff" ] || rm -f "out/$id.diff"
+          done < "${{ github.event.inputs.cases }}"
+          ls out | wc -l
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gitdiff
+          path: out/
+          if-no-files-found: warn
