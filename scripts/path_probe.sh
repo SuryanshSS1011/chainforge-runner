@@ -26,19 +26,24 @@ timeout 1500 docker run --rm -v "$W:/pp" -e T="$T" -e RF="$RF" -e RL="$RL" -e RF
   fi
   [ -x "$B" ] || { echo no_target > /pp/status; exit 0; }
   ok() { [ -n "$1" ] && [ "$1" != "None" ]; }
-  # Three patterns cover a C symbol (foo), a C++ free function (foo(int)) and a member or
-  # namespaced one (ns::C::foo(int)). gdb 7 regexes are basic, and rbreak splits FILE:REGEX at
-  # the first colon, so no pattern contains one.
-  pats() { printf "%s\n" "^$1\$" "^$1(" "[^A-Za-z0-9_]$1("; }
-  # rbreak lines for one function, restricted to its file when that finds a symbol: binaries
-  # without debug info know no files, and an unrestricted name can land in libc.
+  # Candidate commands for one function. `break FILE:NAME` finds a C symbol in a binary with
+  # line tables only; rbreak finds C++ names (gdb 7 does not match `foo` against `ns::C::foo`),
+  # with three basic regexes for a C symbol, a free C++ function and a qualified one (rbreak
+  # splits FILE:REGEX at the first colon, so none contains one). Restricted to the file of the site;
+  # unrestricted only when no restricted command resolves, since an unqualified name can land in
+  # libc. Only commands that resolve in a dry pass are kept.
+  cands() {
+    local pre=""; [ -n "$2" ] && pre="$2:"
+    printf "break %s%s\n" "$pre" "$1"
+    for p in "^$1\$" "^$1(" "[^A-Za-z0-9_]$1("; do printf "rbreak %s%s\n" "$pre" "$p"; done
+  }
+  resolves() { gdb -nx -batch -ex "set breakpoint pending off" -ex "$1" "$B" </dev/null 2>/dev/null | grep -q "^Breakpoint [0-9]"; }
   fn() {
-    local pre="" n=0
-    if ok "$2"; then
-      n=$(pats "$1" | while read -r p; do gdb -nx -batch -ex "rbreak $2:$p" "$B" </dev/null 2>/dev/null; done | grep -c "^Breakpoint [0-9]")
-      [ "$n" -gt 0 ] && pre="$2:"
-    fi
-    pats "$1" | while read -r p; do printf "rbreak %s%s\n" "$pre" "$p"; done
+    local kept=""
+    if ok "$2"; then kept=$(cands "$1" "$2" | while read -r c; do resolves "$c" && echo "$c"; done); fi
+    [ -n "$kept" ] || kept=$(cands "$1" "" | while read -r c; do resolves "$c" && echo "$c"; done)
+    [ -n "$kept" ] && printf "%s\n" "$kept"
+    return 0
   }
   {
     printf "set pagination off\nset confirm off\nset breakpoint pending on\n"
