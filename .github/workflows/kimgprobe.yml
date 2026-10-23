@@ -1,0 +1,18 @@
+name: kimgprobe
+on:
+  workflow_dispatch:
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        v: [7, 8, 9, 10]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the era compiler image and report
+        run: |
+          mkdir -p k && cp scripts/kimg_apt.sh k/apt.sh
+          printf '%s\n' "FROM gcc:${{ matrix.v }}" 'COPY apt.sh /apt.sh' 'RUN sh /apt.sh' > k/Dockerfile
+          docker build -t "cf-kbuild:${{ matrix.v }}" k 2>&1 | tail -60
+          docker run --rm "cf-kbuild:${{ matrix.v }}" sh -c 'gcc --version | head -1; ld --version | head -1; grep PRETTY /etc/os-release'

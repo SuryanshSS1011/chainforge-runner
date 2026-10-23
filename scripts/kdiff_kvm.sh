@@ -107,18 +107,22 @@ MK=(make -C "$KSRC" -j"$JOBS" CROSS_COMPILE="$CROSS" KCFLAGS=-g0 HOSTCFLAGS="-g0
     ${HOSTCC:+HOSTCC=$HOSTCC} ${HOSTCC:+HOSTCXX=${HOSTCC/gcc/g++}})
 # Kernels before 5.8 predate gcc 10 and the runner's binutils and glibc: objtool, thunks and
 # FORTIFY checks fail there (43 of 56 builds in the first runner batch). Build them inside the
-# compiler syzbot used for that era, gcc 8 for 4.x and gcc 9 for 5.0-5.7 (Docker's gcc images,
+# compiler syzbot used for that era, gcc 7 before 4.19, gcc 8 for the rest of 4.x, gcc 9 for 5.0-5.7 and gcc 10 for 5.8-5.15, whose
+# objtool fails against the runner's binutils (Docker's gcc images,
 # with their own binutils and host libraries), for both revisions alike. Recorded as the compiler.
 KIMG="${CF_KIMG:-}"
 if [[ -z "$KIMG" && -z "${CF_GCC:-}" ]]; then
   if (( VER < 4 || (VER == 4 && PL < 19) )); then KIMG=7
-  elif (( VER < 5 )); then KIMG=8; elif (( VER == 5 && PL < 8 )); then KIMG=9; fi
+  elif (( VER < 5 )); then KIMG=8; elif (( VER == 5 && PL < 8 )); then KIMG=9
+  elif (( VER == 5 && PL < 16 )); then KIMG=10; fi
 fi
 if [[ -n "$KIMG" ]] && command -v docker >/dev/null; then
   if ! docker image inspect "cf-kbuild:$KIMG" >/dev/null 2>&1; then
-    printf '%s\n' "FROM gcc:$KIMG" \
-      'RUN (apt-get update -qq || { sed -i "s|deb.debian.org|archive.debian.org|g; s|security.debian.org|archive.debian.org|g; /-updates/d" /etc/apt/sources.list; apt-get -o Acquire::Check-Valid-Until=false update -qq; }) && apt-get install -y -qq flex bison bc libelf-dev libssl-dev cpio kmod >/dev/null' \
-      | for t in 1 2 3; do docker build -q -t "cf-kbuild:$KIMG" - >"$WORK/kimg.log" 2>&1 && break; sleep 60; done
+    mkdir -p "$WORK/kimg"
+    printf '%s\n' "FROM gcc:$KIMG" 'COPY apt.sh /apt.sh' 'RUN sh /apt.sh' >"$WORK/kimg/Dockerfile"
+    cp "$(dirname "$0")/kimg_apt.sh" "$WORK/kimg/apt.sh"
+    for t in 1 2 3; do docker build -t "cf-kbuild:$KIMG" "$WORK/kimg" >"$WORK/kimg.log" 2>&1 && break; sleep 60; done
+    docker image inspect "cf-kbuild:$KIMG" >/dev/null 2>&1 || tail -40 "$WORK/kimg.log" >"$OUT/kimg.log"
     # The era compiler is part of the method: without it the case is an infrastructure stop,
     # never a build failure under the wrong compiler.
     docker image inspect "cf-kbuild:$KIMG" >/dev/null 2>&1 || emit toolchain_missing "gcc:$KIMG image"
