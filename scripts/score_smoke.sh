@@ -7,7 +7,8 @@ ID="$1"; PROJECT="$2"; URL="$3"; OUT="$4"; TARGET="${5:-}"
 [ -n "$TARGET" ] && export CF_CORPUS=1 CF_TARGET="$TARGET"
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 mkdir -p "$OUT"
-python3 - "$URL" "$OUT/fix.diff" "$HERE" <<'PY' || { echo '{"status":"diff_unfetchable"}' > "$OUT/smoke.json"; exit 0; }
+python3 - "$URL" "$OUT/fix.diff" "$HERE" <<'PY' || python3 "$HERE/scripts/git_fix_diff.py" "$URL" "$OUT/fix.diff" \
+  || { echo '{"status":"diff_unfetchable"}' > "$OUT/smoke.json"; exit 0; }
 import sys
 sys.path.insert(0, sys.argv[3] + "/repo/infra/verify")
 from fetch_fix_diffs import fetch

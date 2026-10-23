@@ -1,0 +1,42 @@
+42470537	libssh	https://git.libssh.org/projects/libssh.git07f7fa7806e94ccaa271c185213afed80e13a77d	libssh_server_fuzzer
+42474568	radare2	https://github.com/radare/radare2/commit/67d531dce9df1630387a870833cfdb6cd707ee9c	ia_fuzz
+42475993	hostap	https://w1.fi/cgit/hostap/commit/?id=ce11c281ad1de25a815d49a29043d127cbc6354d	
+42476041	hostap	https://w1.fi/cgit/hostap/commit/?id=ce11c281ad1de25a815d49a29043d127cbc6354d	x509
+42479123	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/bbf9a0b5eef3599a1c6a7a3bea40da9f2c37df83	
+42479556	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/efea62b44631289f995db16faf70979d6592580b	fuzz_disassemble
+42480444	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/f00901886d0acb7a4d4b177a5cabe8bd9ca2307b	fuzz_disassemble
+42481498	hostap	https://w1.fi/cgit/hostap/commit/?id=76162b18280b174cd5e7101c9678f69785409fa3	x509
+42481812	njs	http://hg.nginx.org/njs9b70f038abfa8036d1d8a84d2d8db7c98039a957	
+42482100	njs	http://hg.nginx.org/njs3313d0d593a09f27b7aab54c70dc808c61021ac5	
+42487533	njs	http://hg.nginx.org/njs98f436565ddf8dd14fe4a5291324137672b50b3b	
+42494156	libavc	https://android.googlesource.com/platform/external/libavc/+/de9c6cefb626803279d217590ad19255f48ff4d0%5E%21/	avc_dec_fuzzer
+42494812	freeimage-svn	https://svn.code.sf.net/p/freeimage/svn1895	
+42495611	qt	https://code.qt.io/cgit/qt/qtbase.git/commit/?id=fb0fcd7fe3f94a227dd66a110f5a3353008e37e5	qtbase_corelib_time_qdatetime_fromstring
+42498298	libssh	https://git.libssh.org/projects/libssh.git06799453835d2c6608c074823ccfc399ccc0c525	ssh_client_fuzzer
+42499700	httpd	https://svn.apache.org/repos/asf/httpd/httpd/trunk1892012	
+42500429	nginx	http://hg.nginx.org/nginx/01829d1620956241455867fd8ba28ba54eed5aa9	http_request_fuzzer
+42501349	freeimage-svn	https://svn.code.sf.net/p/freeimage/svn1907	load_from_memory_fuzzer
+42502136	gdbm	https://git.gnu.org.ua/gdbm.git/commit/?id=ca7194987388a825f57fdebd73eb9c491a8749b0	
+42509561	elfutils	https://sourceware.org/git/?p=elfutils.git;a=commitdiff;h=ed42e7cf11ddb11ffcce9e17276476e0c3d14c71	
+42530125	qemu	https://git.qemu.org/git/qemu.git5fee33d97a7f2e95716417bd164f2f5264acd976	qemu-fuzz-i386-target-generic-fuzz-e1000
+42537903	inchi	https://github.com/IUPAC-InChI/InChI/commit/700998b497c89086125b0cd37d6092b8f77aeddb	
+42489732	imagemagick	https://github.com/imagemagick/imagemagick/commit/29980610486001ca5404ccb3b3d8e2e124a8ca37	encoder_tiff64_fuzzer
+42479223	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/27cee81d06fcff87d9c026a571db58c29c489dfa	fuzz_disassemble
+42470146	boringssl	https://boringssl.googlesource.com/boringssl/+/371305f58ac47a98d32f30a9edc6fafa72e842be%5E%21/	ssl_ctx_api
+42482537	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/fe90ae8a9f54e4fe8b9089fed48b0e1818414f57	fuzz_disassemble
+42482540	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/340f3ac8082771ecc473ab938fc3d7cbf607ddaa	fuzz_disassemble
+42482563	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/d1023b5d1e4483e5fa3bdab97bc041e1b1c05c5d	fuzz_disassemble
+42482566	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/4c4addbe57711f1cdbb72305b8cbd03a68ae2e34	fuzz_disassemble
+42482567	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/03704c7704870a0e6cbb0eae99488d544c4adb30	fuzz_disassemble
+42482568	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/832a580781060f54731fcf654d76ac1332037a47	fuzz_disassemble
+42482604	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/a18cd0cab43f45b05e9f8bcbf8fed1d67834442d	fuzz_disassemble
+42504520	njs	http://hg.nginx.org/njs7f72930cf1ac021a40c5ce2ceedc23463c48fd5e	njs_process_script_fuzzer
+42539821	tor	https://git.torproject.org/tor.gitc000763f1eadb01bdb1fc159e698ebcff58b3b8b	oss-fuzz-extrainfo
+42480763	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/100b122fc125bdf1fe768a3331a0cd413c3d1261	fuzz_disassemble
+42480994	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/030a2e78acf66c5c12e073ec3887a167da7a7195	fuzz_disassemble
+42515541	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/f15ba945a49b75c23f8133f3be170a681bb050de	fuzz_disas_ext-bfd_arch_arm
+42507057	binutils-gdb	https://github.com/bminor/binutils-gdb/commit/ce20459e162175710d8ef56118fc34edabfdce5e	fuzz_disas_ext-bfd_arch_i386
+42518789	serenity	https://github.com/SerenityOS/serenity/commit/0016f63547f70f969eeb6030d8d7433b05cae934	FuzzFlacLoader
+42533540	aom	https://aomedia.googlesource.com/aom/+/08efc1491525624dc5f5ebf0e450227524a7db4f%5E%21/	av1_dec_fuzzer
+42539593	graphicsmagick	https://foss.heptapod.net/graphicsmagick/graphicsmagickf60c430ff40aac855614760776095d68b3c28f36	enhance_fuzzer
+42497729	serenity	https://github.com/SerenityOS/serenity/commit/4e8e1b7b3a2cd25ab4b69cebea32232496f4a5d3	FuzzURL
