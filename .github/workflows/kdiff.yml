@@ -50,7 +50,7 @@ jobs:
           sudo apt-get install -y -qq qemu-system-x86 flex bison bc libelf-dev libssl-dev cpio e2fsprogs gcc-11 g++-11 >/dev/null
           sudo chmod 666 /dev/kvm
           mkdir -p "$CF_BASE"/{tools,imgbuild,out,work,logs}
-          cp scripts/kdiff_kvm.sh scripts/build_rootfs.sh "$CF_BASE"/
+          cp scripts/kdiff_kvm.sh scripts/build_rootfs.sh scripts/kimg_apt.sh "$CF_BASE"/
       - name: Cache kernel.org crosstool compilers
         uses: actions/cache@v4
         with:
