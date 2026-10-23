@@ -111,13 +111,17 @@ MK=(make -C "$KSRC" -j"$JOBS" CROSS_COMPILE="$CROSS" KCFLAGS=-g0 HOSTCFLAGS="-g0
 # with their own binutils and host libraries), for both revisions alike. Recorded as the compiler.
 KIMG="${CF_KIMG:-}"
 if [[ -z "$KIMG" && -z "${CF_GCC:-}" ]]; then
-  if (( VER < 5 )); then KIMG=8; elif (( VER == 5 && PL < 8 )); then KIMG=9; fi
+  if (( VER < 4 || (VER == 4 && PL < 19) )); then KIMG=7
+  elif (( VER < 5 )); then KIMG=8; elif (( VER == 5 && PL < 8 )); then KIMG=9; fi
 fi
 if [[ -n "$KIMG" ]] && command -v docker >/dev/null; then
   if ! docker image inspect "cf-kbuild:$KIMG" >/dev/null 2>&1; then
     printf '%s\n' "FROM gcc:$KIMG" \
       'RUN (apt-get update -qq || { sed -i "s|deb.debian.org|archive.debian.org|g; s|security.debian.org|archive.debian.org|g; /-updates/d" /etc/apt/sources.list; apt-get -o Acquire::Check-Valid-Until=false update -qq; }) && apt-get install -y -qq flex bison bc libelf-dev libssl-dev cpio kmod >/dev/null' \
-      | docker build -q -t "cf-kbuild:$KIMG" - >"$WORK/kimg.log" 2>&1 || KIMG=""
+      | for t in 1 2 3; do docker build -q -t "cf-kbuild:$KIMG" - >"$WORK/kimg.log" 2>&1 && break; sleep 60; done
+    # The era compiler is part of the method: without it the case is an infrastructure stop,
+    # never a build failure under the wrong compiler.
+    docker image inspect "cf-kbuild:$KIMG" >/dev/null 2>&1 || emit toolchain_missing "gcc:$KIMG image"
   fi
 fi
 if [[ -n "$KIMG" ]]; then
@@ -146,7 +150,8 @@ CFG
 
 # Host-toolchain compatibility, used only after a normal build fails. A modern host (glibc,
 # OpenSSL 3, libelf, gcc -Werror) breaks host-side tools of older kernels: SELinux genheaders
-# rejects the host's AF_MAX, sign-file and objtool hit deprecation errors. These touch no code
+# rejects the host's AF_MAX, sign-file and objtool hit deprecation errors; the bpfilter helper and one panel driver
+# fail to build or link on some revisions. These touch no code
 # path the reproducer exercises, and once enabled they apply to BOTH revisions (the .config and
 # flags persist), so fix^ and fix still differ by exactly the fix. Recorded as build_compat.
 COMPAT=0
@@ -156,6 +161,8 @@ enable_compat() {
 CONFIG_WERROR=n
 CONFIG_SECURITY_SELINUX=n
 CONFIG_MODULE_SIG=n
+CONFIG_BPFILTER=n
+CONFIG_DRM_PANEL_ILITEK_ILI9882T=n
 CFG
   MK+=(WERROR=0 KCFLAGS="-g0 -Wno-error" HOSTCFLAGS="-g0 -O2 -Wno-error -Wno-deprecated-declarations")
 }
