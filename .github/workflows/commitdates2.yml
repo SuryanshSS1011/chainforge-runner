@@ -1,0 +1,26 @@
+name: commitdates2
+on:
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: "Case list: <arvo id>\\t<fix url> per line (public commits)"
+        required: true
+jobs:
+  dates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read each fix commit's author date with a shallow, blob-less fetch
+        run: |
+          mkdir -p out
+          while IFS=$'\t' read -r id url; do
+            [ -z "$id" ] && continue
+            bash scripts/git_fix_date.sh "$id" "$url" </dev/null >> out/dates.jsonl
+          done < "${{ github.event.inputs.cases }}"
+          wc -l out/dates.jsonl
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: commitdates2
+          path: out/
