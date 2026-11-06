@@ -13,6 +13,10 @@ on:
         description: "Boots of fix^ before giving up (races fire intermittently)"
         required: true
         default: "1"
+      artifact:
+        description: "Artifact name prefix (kablate for hunk tests, kscore for scorer runs)"
+        required: false
+        default: "kablate"
 
 jobs:
   plan:
@@ -63,10 +67,11 @@ jobs:
       - name: Two-sided kernel replays for this shard
         run: |
           n=${{ github.event.inputs.shards }}; i=0
-          while IFS=$'\t' read -r extid fix; do
+          while IFS=$'\t' read -r extid fix cand; do
             [ -z "$extid" ] && continue
             if [ $(( i % n )) -eq ${{ matrix.shard }} ]; then
-              bash "$CF_BASE/kablate_kvm.sh" "$extid" "$fix" </dev/null 2>&1 | tail -20
+              # a third column (a candidate patch) runs the kernel patch scorer instead
+              bash "$CF_BASE/kablate_kvm.sh" "$extid" "$fix" ${cand:+"$cand"} </dev/null 2>&1 | tail -20
               true
             fi
             i=$((i+1))
@@ -74,7 +79,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: kablate-${{ matrix.shard }}
+          name: ${{ github.event.inputs.artifact || 'kablate' }}-${{ matrix.shard }}
           path: w/ablate/
           retention-days: 30
           if-no-files-found: warn

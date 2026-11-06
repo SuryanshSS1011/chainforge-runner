@@ -7,10 +7,16 @@
 # is applied alone, the kernel rebuilt incrementally, and the reproducer booted twice: a hunk is
 # the proven guard only if the bug fires on neither boot and both boots demonstrably ran.
 #
-# Usage: kablate_kvm.sh <extid> <fix_sha>     Output: $BASE/ablate/<extid>/result.json + hunks/
+# Kernel patch scorer: a third argument names a candidate patch, `devfix` (the fix's own diff) or a
+# file. After the same control, the candidate is applied whole to fix^ as the only variant and
+# booted twice; result.json gets "mode": "score" and "outcome": pass | crash | apply_failed |
+# buildfail (PREREGISTRATION, release 1.0.4 supply, item 2).
+#
+# Usage: kablate_kvm.sh <extid> <fix_sha> [candidate]   Output: $BASE/ablate/<extid>/result.json
 set -uo pipefail
-EXTID="${1:?usage: kablate_kvm.sh <extid> <fix_sha>}"
+EXTID="${1:?usage: kablate_kvm.sh <extid> <fix_sha> [candidate]}"
 FIX="${2:?missing fix_sha}"
+CAND="${3:-}"
 BASE="${CF_BASE:-/scratch/sss6371/cfk}"
 OUT="$BASE/ablate/$EXTID"
 WORK="$BASE/awork/$EXTID"
@@ -21,19 +27,26 @@ mkdir -p "$OUT/hunks" "$WORK"
 rm -f "$OUT/result.json"
 log() { echo "[kablate $EXTID] $(date +%T) $*" >&2; }
 emit() {  # status, then the per-hunk results file
-  python3 - "$OUT/result.json" "$EXTID" "$FIX" "$1" "${2:-}" "$WORK/hunks.tsv" <<'PY'
+  python3 - "$OUT/result.json" "$EXTID" "$FIX" "$1" "${2:-}" "$WORK/hunks.tsv" "$CAND" <<'PY'
 import json, os, sys
-out, extid, fix, status, detail, tsv = sys.argv[1:7]
+out, extid, fix, status, detail, tsv, cand = sys.argv[1:8]
 hunks = []
 if os.path.exists(tsv):
     for line in open(tsv):
         h, f, add, outcome = line.rstrip("\n").split("\t")
         hunks.append({"hunk": h, "file": f, "added": int(add), "outcome": outcome})
 guard = next((h for h in hunks if h["outcome"] == "clean"), None)
-json.dump({"extid": extid, "fix_commit": fix, "status": status, "detail": detail,
-           "control": "crashed" if status in ("ok", "no_single_hunk") else None,
-           "results": hunks, "guard_hunk": guard, "source_causally_proven": bool(guard)},
-          open(out, "w"), indent=1)
+res = {"extid": extid, "fix_commit": fix, "status": status, "detail": detail,
+       "control": "crashed" if status in ("ok", "no_single_hunk") else None}
+if cand:  # scorer mode: one candidate, no hunk proof
+    o = hunks[0]["outcome"] if hunks else None
+    res |= {"mode": "score", "candidate": cand, "results": hunks,
+            "outcome": None if o is None else "pass" if o == "clean"
+            else o if o in ("apply_failed", "buildfail")
+            else "crash" if "fired_match" in o else "inconclusive"}  # R10: no verdict
+else:
+    res |= {"results": hunks, "guard_hunk": guard, "source_causally_proven": bool(guard)}
+json.dump(res, open(out, "w"), indent=1)
 PY
   log "-> $1 ${2:-}"
   [[ "${CF_KEEP:-0}" != "1" ]] && rm -rf "$WORK"
@@ -62,7 +75,14 @@ git -C "$KSRC" fetch -q --depth 2 origin "$FIX" 2>/dev/null || {
   git -C "$KSRC" fetch -q --depth 2 mirror "$FIX" 2>/dev/null || emit fetch_failed ""
 }
 git -C "$KSRC" diff "$FIX^" "$FIX" > "$OUT/fix.diff"
-"${CF_PY:-python3.12}" "$BASE/repo/infra/verify/split_hunks.py" "$OUT/fix.diff" "$OUT/hunks" > "$WORK/split.log" 2>&1 || emit hunk_split_failed ""
+if [[ -n "$CAND" ]]; then  # scorer mode: the candidate, whole, is the only variant
+  if [[ "$CAND" == devfix ]]; then cp "$OUT/fix.diff" "$OUT/hunks/candidate.patch"
+  else cp "$CAND" "$OUT/hunks/candidate.patch" 2>/dev/null || emit candidate_missing "$CAND"; fi
+  ADDED=$(grep -c '^+[^+]' "$OUT/hunks/candidate.patch" || true)
+  python3 -c "import json;json.dump({'written':1,'hunks':[{'name':'candidate.patch','file':'(candidate)','added':${ADDED:-0}}]},open('$OUT/hunks/index.json','w'))"
+else
+  "${CF_PY:-python3.12}" "$BASE/repo/infra/verify/split_hunks.py" "$OUT/fix.diff" "$OUT/hunks" > "$WORK/split.log" 2>&1 || emit hunk_split_failed ""
+fi
 N=$(python3 -c "import json;print(json.load(open('$OUT/hunks/index.json'))['written'])" 2>/dev/null || echo 0)
 (( N > 0 )) || emit no_code_hunks ""
 git -C "$KSRC" checkout -q "$FIX^"
