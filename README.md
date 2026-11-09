@@ -12,3 +12,7 @@ dataset records, labels or logs; results are uploaded as workflow artifacts.
 - `.github/workflows/rerun.yml` — manual dispatch with a case list, sharded across runners.
 
 Run: `gh workflow run rerun -f cases=cases/<list>.txt -f shards=20`
+
+- `scripts/extract_poc.py` and `.github/workflows/pocs.yml` copy each image's crashing input
+  (`/tmp/poc`) out of the vulnerable image, by digest, without pulling the image. Case lists hold
+  ARVO ids and image digests only; the inputs come back as workflow artifacts.

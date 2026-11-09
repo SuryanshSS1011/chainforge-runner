@@ -1,0 +1,46 @@
+name: pocs
+on:
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: "Case list (<arvo id>\t<vulnerable image digest> per line), path in this repo"
+        required: true
+        default: "cases/pocs_reproduced.txt"
+      shards:
+        description: "Number of parallel runners (max 20 concurrent on the Free plan)"
+        required: true
+        default: "20"
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      shards: ${{ steps.s.outputs.shards }}
+    steps:
+      - id: s
+        run: |
+          n=${{ github.event.inputs.shards }}
+          echo "shards=$(python3 -c "import json;print(json.dumps(list(range($n))))")" >> "$GITHUB_OUTPUT"
+
+  extract:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJson(needs.plan.outputs.shards) }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Copy the crashing inputs out of this shard's images
+        env:
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: python3 scripts/extract_poc.py "${{ github.event.inputs.cases }}" ${{ matrix.shard }} ${{ github.event.inputs.shards }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pocs-${{ matrix.shard }}
+          path: out/
+          retention-days: 30
+          if-no-files-found: warn
