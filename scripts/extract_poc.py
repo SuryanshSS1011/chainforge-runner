@@ -24,14 +24,29 @@ PACE = float(os.environ.get("PACE", "37"))
 _tok = {"t": None, "at": 0.0}
 
 
+_AUTH = {"use": bool(os.environ.get("DOCKERHUB_TOKEN"))}
+URL = "https://auth.docker.io/token?service=registry.docker.io&scope=repository:n132/arvo:pull"
+
+
 def token():
     if time.time() - _tok["at"] > 200:
-        cmd = ["curl", "-sS", "-m", "30"]
-        if os.environ.get("DOCKERHUB_TOKEN"):
-            cmd += ["-u", f"{os.environ['DOCKERHUB_USER']}:{os.environ['DOCKERHUB_TOKEN']}"]
-        cmd.append("https://auth.docker.io/token?service=registry.docker.io&scope=repository:n132/arvo:pull")
-        _tok["t"] = json.loads(subprocess.run(cmd, capture_output=True, text=True, check=True).stdout)["token"]
-        _tok["at"] = time.time()
+        for anonymous in ((False, True) if _AUTH["use"] else (True,)):
+            cmd = ["curl", "-sS", "-m", "30"]
+            if not anonymous:
+                cmd += ["-u", f"{os.environ['DOCKERHUB_USER']}:{os.environ['DOCKERHUB_TOKEN']}"]
+            out = subprocess.run(cmd + [URL], capture_output=True, text=True).stdout
+            try:
+                t = json.loads(out).get("token")
+            except ValueError:
+                t = None
+            if t:
+                _tok["t"], _tok["at"] = t, time.time()
+                break
+            if not anonymous:  # the stored login was refused: go on without it
+                print("Docker Hub login refused; continuing anonymously", flush=True)
+                _AUTH["use"] = False
+        else:
+            raise RuntimeError(f"no registry token: {out[:200]}")
     return _tok["t"]
 
 
