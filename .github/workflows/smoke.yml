@@ -1,0 +1,59 @@
+name: smoke
+# Follow the public RootSink README on clean hosted machines (scripts/readme_smoke.sh), and mirror
+# the images its example records use to GHCR by digest (scripts/mirror_images.sh).
+on:
+  workflow_dispatch:
+    inputs:
+      mirror_list:
+        description: "Images to mirror (<tag>\\t<digest> per line), path in this repo"
+        required: true
+        default: "cases/mirror_smoke.tsv"
+
+jobs:
+  readme:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [arvo, kernel, digests]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: runner
+      - name: Free disk for images and kernel builds
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+      - name: Follow the README (${{ matrix.part }})
+        run: bash runner/scripts/readme_smoke.sh ${{ matrix.part }} out
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-${{ matrix.part }}
+          path: out/
+          retention-days: 30
+          if-no-files-found: warn
+
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    permissions:
+      contents: read
+      packages: write
+    env:
+      MIRROR: ghcr.io/suryanshss1011/rootsink-arvo
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install crane
+        run: |
+          curl -sSfL https://github.com/google/go-containerregistry/releases/download/v0.20.2/go-containerregistry_Linux_x86_64.tar.gz | sudo tar xz -C /usr/local/bin crane
+          crane version
+      - name: Copy the images by digest
+        run: bash scripts/mirror_images.sh "${{ github.event.inputs.mirror_list }}" out
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mirror
+          path: out/
+          retention-days: 30
+          if-no-files-found: warn
