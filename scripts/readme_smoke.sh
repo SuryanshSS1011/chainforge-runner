@@ -105,12 +105,26 @@ print(re.search(r"```bash\n(.*?)```", s, re.S).group(1))
 PY
   ENV_LINE=$(grep -m1 '^export CF_BASE' "$OUT/kernel_setup.sh")
   step kernel_setup_readme "sudo apt-get update -qq && cd '$R' && bash -e '$OUT/kernel_setup.sh'"
+  eval "$ENV_LINE"
+  # What the setup left behind, so a boot that never comes up can be traced to its input.
+  step kernel_env "file '$CF_BASE/imgbuild/busybox'; head -c 120 '$CF_BASE/imgbuild/busybox' | od -c | head -3
+    ls -la /dev/kvm; '$CF_QEMU' --version | head -1; ls '$CF_BASE/tools'; df -h / '$HOME'"
   # The README's commands, with the record's extid and fix sha for the placeholders.
   step kdiff_readme "cd '$R' && $ENV_LINE && bash \"\$CF_BASE/kdiff_kvm.sh\" $EXTID $FIXSHA </dev/null"
-  eval "$ENV_LINE"
   verdict kdiff_readme_result "$CF_BASE/out/$EXTID/differential.json"
+  keep_kernel_logs() { # the boots' console output (a public syzbot reproducer on a public kernel)
+    mkdir -p "$OUT/kernel_logs/$1"
+    for f in "$2"/*.console.log "$2"/*.log; do
+      [ -f "$f" ] && tail -300 "$f" >"$OUT/kernel_logs/$1/$(basename "$f")"
+    done
+    df -h / >"$OUT/kernel_logs/$1/df.txt" 2>&1
+  }
+  keep_kernel_logs kdiff_out "$CF_BASE/out/$EXTID"
+  keep_kernel_logs kdiff_work "$CF_BASE/work/$EXTID"
   step kscore_devfix "cd '$R' && $ENV_LINE && bash \"\$CF_BASE/kablate_kvm.sh\" $EXTID $FIXSHA devfix </dev/null"
   verdict kscore_devfix_result "$CF_BASE/ablate/$EXTID/result.json"
+  keep_kernel_logs kablate_out "$CF_BASE/ablate/$EXTID"
+  keep_kernel_logs kablate_work "$CF_BASE/awork/$EXTID"
   ;;
 *)
   echo "usage: readme_smoke.sh <arvo|kernel|digests> <out dir>" >&2
