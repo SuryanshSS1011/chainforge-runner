@@ -6,8 +6,8 @@
 # Each step runs the README's command as written, in a fresh shell, against a fresh clone of
 # github.com/SuryanshSS1011/RootSink. Where the README leaves a placeholder (<arvo_id>, my.patch),
 # the step uses the README's own example record, CHAINFORGE-0042476579 (OSS-Fuzz 42476579,
-# wireshark), and its developer fix from `patch_diff`. The kernel part first runs the README's
-# command alone, then again after the setup its pointer (infra/cse-kvm/github/kablate.yml) does.
+# wireshark), and its developer fix from `patch_diff`. The kernel part runs the README's kernel
+# setup block verbatim, then its re-run and scoring commands on CHAINFORGE-0800011.
 # Writes <out>/steps.jsonl (one line per step: rc, seconds, command, last log lines), one log per
 # step, and a table in the job summary. Nothing here is RootSink data: it only reads the clone.
 set -u
@@ -95,21 +95,21 @@ digests)
   ;;
 kernel)
   common
-  # The README's command as written, with nothing else set up.
-  step kdiff_readme_only "export CF_BASE=\$HOME/rootsink-kernel && cd '$R' && bash infra/cse-kvm/kdiff_kvm.sh $EXTID $FIXSHA"
-  # The same run after the setup infra/cse-kvm/github/kablate.yml does, from the clone's copies.
-  export CF_BASE="$HOME/rootsink-kernel2" CF_QEMU=qemu-system-x86_64 CF_JOBS=4
-  step kernel_setup "sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
-    sudo apt-get update -qq && sudo apt-get install -y -qq qemu-system-x86 flex bison bc libelf-dev libssl-dev cpio e2fsprogs gcc-11 g++-11 >/dev/null
-    sudo chmod 666 /dev/kvm
-    mkdir -p \"\$CF_BASE\"/{tools,imgbuild,out,work,logs}
-    cp '$R'/infra/cse-kvm/github/{kdiff_kvm.sh,kablate_kvm.sh,build_rootfs.sh,kimg_apt.sh} \"\$CF_BASE\"/
-    cp -r '$R' \"\$CF_BASE\"/repo
-    cd \"\$CF_BASE/tools\" && for v in 10.5.0 12.3.0 13.2.0; do curl -sSfL https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/x86_64/\$v/x86_64-gcc-\$v-nolibc-x86_64-linux.tar.xz | tar xJ; done
-    curl -sSfL -o \"\$CF_BASE/imgbuild/busybox\" https://busybox.net/downloads/binaries/1.35.0-x86_64-linux-musl/busybox && chmod +x \"\$CF_BASE/imgbuild/busybox\""
-  step kdiff_with_setup "bash \"\$CF_BASE/kdiff_kvm.sh\" $EXTID $FIXSHA </dev/null"
-  verdict kdiff_with_setup_result "$CF_BASE/out/$EXTID/differential.json"
-  step kscore_devfix "bash \"\$CF_BASE/kablate_kvm.sh\" $EXTID $FIXSHA devfix </dev/null"
+  # The README's kernel setup block, verbatim, from the repository root (sudo apt-get needs an
+  # index first on a fresh runner).
+  python3 - "$R/README.md" >"$OUT/kernel_setup.sh" <<'PY'
+import re, sys
+t = open(sys.argv[1]).read()
+s = t[t.index("### Linux kernel bugs (syzbot)"):]
+print(re.search(r"```bash\n(.*?)```", s, re.S).group(1))
+PY
+  ENV_LINE=$(grep -m1 '^export CF_BASE' "$OUT/kernel_setup.sh")
+  step kernel_setup_readme "sudo apt-get update -qq && cd '$R' && bash -e '$OUT/kernel_setup.sh'"
+  # The README's commands, with the record's extid and fix sha for the placeholders.
+  step kdiff_readme "cd '$R' && $ENV_LINE && bash \"\$CF_BASE/kdiff_kvm.sh\" $EXTID $FIXSHA </dev/null"
+  eval "$ENV_LINE"
+  verdict kdiff_readme_result "$CF_BASE/out/$EXTID/differential.json"
+  step kscore_devfix "cd '$R' && $ENV_LINE && bash \"\$CF_BASE/kablate_kvm.sh\" $EXTID $FIXSHA devfix </dev/null"
   verdict kscore_devfix_result "$CF_BASE/ablate/$EXTID/result.json"
   ;;
 *)
