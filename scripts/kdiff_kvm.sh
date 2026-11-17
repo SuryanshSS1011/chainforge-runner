@@ -22,6 +22,12 @@ WORK="$BASE/work/$EXTID"
 QEMU="${CF_QEMU:-/usr/libexec/qemu-kvm}"
 JOBS="${CF_JOBS:-9}"
 BOOT_T="${CF_BOOT_TIMEOUT:-600}"
+# The VM declares one NUMA node in its firmware tables. syzbot's built-in kernel command line
+# fakes two nodes (numa=fake=2). Without a node table, a GenuineIntel guest spreads the four
+# vCPUs of its one package over both, and from Linux 7.0 that is a boot-time WARN which
+# panic_on_warn makes fatal, so the reproducer never runs. An AMD guest already keeps every
+# vCPU on node 0, so on AMD hosts the boot is unchanged.
+NUMA1=(-object memory-backend-ram,id=ram0,size=4G -numa node,nodeid=0,cpus=0-3,memdev=ram0)
 SYZ="https://syzkaller.appspot.com"
 mkdir -p "$OUT" "$WORK"
 rm -f "$OUT/differential.json"
@@ -196,7 +202,7 @@ bash "$BASE/build_rootfs.sh" "$WORK/repro" "$WORK/rootfs.ext4" >"$WORK/rootfs.lo
 boot() {  # label -> echoes fired_match | fired_other | crashed_other | clean | not_run | no_boot
   local con="$OUT/$1.console.log" rc
   cp "$WORK/rootfs.ext4" "$WORK/rootfs.$1.ext4"
-  timeout "$BOOT_T" nice -n 5 "$QEMU" -enable-kvm -cpu host -M pc -smp 4 -m 4G -no-reboot -nographic \
+  timeout "$BOOT_T" nice -n 5 "$QEMU" -enable-kvm -cpu host -M pc -smp 4 -m 4G "${NUMA1[@]}" -no-reboot -nographic \
     -kernel "$WORK/bzImage.${1%%[0-9]*}" -drive file="$WORK/rootfs.$1.ext4",format=raw,if=virtio \
     -append "console=ttyS0 root=/dev/vda rw panic=1 kasan_multi_shot=1 init=/init" \
     >"$con" 2>&1
